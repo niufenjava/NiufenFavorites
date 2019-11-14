@@ -2,27 +2,26 @@
   <div>
     <!-- 组件不能写到template的根节点上，即每个组件只有一个根节点，这里的div就是这个template的根节点 -->
     <!--  getindex是自定义事件 -->
-    <el-row>
-      <div class="search-input">
-        <!-- $event是实参，表示event对象 -->
-        <!--
+    <div class="search-input">
+      <!-- $event是实参，表示event对象 -->
+      <!--
                 输入搜索内容即时搜索，所以有一个keyup事件。
                 按回车键有一个进入搜索内容页面，所以有一个keydown.enter事件
                 按上下键可以选择列表条目
             -->
-        <input v-model="keyword" type="text" @keyup="get($event)" @keydown.enter="search()" @keydown.down="selectDown()" @keydown.up.prevent="selectUp()">
-        <!-- 这是一个小叉叉，点击它可清除输入框内容 -->
-        <span class="search-reset" @click="clearInput()">&times;</span>
-        <button class="search-btn" @click="search()">搜一下</button>
-        <div class="search-select">
-          <!-- transition-group也是vue2.0中的新特性,tag='ul'表示用ul包裹v-for出来的li -->
-          <transition-group v-cloak name="itemfade" tag="ul" mode="out-in">
-            <li v-for="(value,index) in myData" :key="value" :class="{selectback:index==now}" class="search-select-option search-select-list" @mouseover="selectHover(index)" @click="selectClick(index)">
-              {{ value }}
-            </li>
-          </transition-group>
-        </div>
-      </div></el-row>
+      <input v-model="keyword" type="text" @keyup="get($event)" @keydown.enter="search()" @keydown.down="selectDown()" @keydown.up.prevent="selectUp()">
+      <!-- 这是一个小叉叉，点击它可清除输入框内容 -->
+      <span class="search-reset" @click="clearInput()">&times;</span>
+      <button class="search-btn" @click="search()">搜一下</button>
+      <div class="search-select">
+        <!-- transition-group也是vue2.0中的新特性,tag='ul'表示用ul包裹v-for出来的li -->
+        <transition-group v-cloak name="itemfade" tag="ul" mode="out-in">
+          <li v-for="(value,index) in myData" :key="value" :class="{selectback:index==now}" class="search-select-option search-select-list" @mouseover="selectHover(index)" @click="selectClick(index)">
+            {{ value }}
+          </li>
+        </transition-group>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -47,9 +46,6 @@ export default {
       value2: '',
       searchIndex: 0,
       logoData: [{
-        name: '360搜索',
-        searchSrc: 'https://www.so.com/s?ie=utf-8&shb=1&src=360sou_newhome&q='
-      }, {
         name: '百度搜索',
         searchSrc: 'https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd='
       }, {

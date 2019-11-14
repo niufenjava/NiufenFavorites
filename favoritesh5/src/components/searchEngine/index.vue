@@ -1,38 +1,45 @@
 <template>
   <div>
-    <!-- 组件不能写到template的根节点上，即每个组件只有一个根节点，这里的div就是这个template的根节点 -->
-    <!--  getindex是自定义事件 -->
-    <div class="search-input">
-      <!-- $event是实参，表示event对象 -->
-      <!--
-                输入搜索内容即时搜索，所以有一个keyup事件。
-                按回车键有一个进入搜索内容页面，所以有一个keydown.enter事件
-                按上下键可以选择列表条目
-            -->
-      <input v-model="keyword" type="text" @keyup="get($event)" @keydown.enter="search()" @keydown.down="selectDown()" @keydown.up.prevent="selectUp()">
-      <!-- 这是一个小叉叉，点击它可清除输入框内容 -->
-      <span class="search-reset" @click="clearInput()">&times;</span>
-      <button class="search-btn" @click="search()">搜一下</button>
-      <div class="search-select">
-        <!-- transition-group也是vue2.0中的新特性,tag='ul'表示用ul包裹v-for出来的li -->
-        <transition-group v-cloak name="itemfade" tag="ul" mode="out-in">
-          <li v-for="(value,index) in myData" :key="value" :class="{selectback:index==now}" class="search-select-option search-select-list" @mouseover="selectHover(index)" @click="selectClick(index)">
-            {{ value }}
-          </li>
-        </transition-group>
-      </div>
+    <div style="margin-top:10px;">
+      <el-input
+        v-model="keyword"
+        placeholder="请输入内容"
+        @keyup="get($event)"
+        @keydown.enter="search()"
+        @keydown.down="selectDown()"
+        @keydown.up.prevent="selectUp()"
+      >
+
+        <el-button slot="prepend" size="medium" @click="switchEngine()">Google</el-button>
+        <el-button slot="append" icon="el-icon-search" @click="search()">Search</el-button>
+      </el-input>
+    </div>
+    <!-- <input v-model="keyword" type="text" @keyup="get($event)" @keydown.enter="search()" @keydown.down="selectDown()" @keydown.up.prevent="selectUp()"> -->
+    <!-- 这是一个小叉叉，点击它可清除输入框内容 -->
+    <!-- <span class="search-reset" @click="clearInput()">&times;</span> -->
+    <!-- <button class="search-btn" @click="search()">搜一下</button> -->
+    <div class="search-select">
+      <!-- transition-group也是vue2.0中的新特性,tag='ul'表示用ul包裹v-for出来的li -->
+      <transition-group v-cloak name="itemfade" tag="ul" mode="out-in">
+        <li v-for="(value,index) in myData" :key="value" :class="{selectback:index==now}" class="search-select-option search-select-list" @mouseover="selectHover(index)" @click="selectClick(index)">
+          {{ value }}
+        </li>
+      </transition-group>
     </div>
   </div>
 </template>
 
 <script type="text/javascript">
-
+import baiduPng from '@/static/img/Baidu_256x84.png'
+import googlePng from '@/static/img/Google_92x30.png'
 export default {
   // 注册组件
   components: {
   },
   data: function () {
     return {
+      baiduPng: baiduPng,
+      googlePng: googlePng,
       myData: [], // 用来接收ajax得到的数据
       keyword: '', // v-model绑定的输入框的value
       now: -1,
@@ -44,6 +51,7 @@ export default {
         label: 'Google'
       }],
       value2: '',
+      value3: true,
       searchIndex: 0,
       logoData: [{
         name: '百度搜索',
@@ -86,6 +94,8 @@ export default {
       // 打开对应的搜索界面
       window.open(this.logoData[this.searchIndex].searchSrc + this.keyword)
     },
+    switchEngine: function () {
+    },
     selectHover: function (index) {
       this.now = index
     },
@@ -107,39 +117,6 @@ export default {
 </script>
 
 <style type="text/css">
-.search-input {
-    height: 45px;
-    width: 600px;
-    margin: 0 auto;
-    margin-top: 10px;
-}
-
-.search-input input {
-    border: 1px solid #e4e4e4;
-    box-sizing: border-box;
-    width: 500px;
-    height: 45px;
-    font-size: 18px;
-    float: left;
-    padding-left: 10px;
-    padding-right: 10px;
-    overflow: hidden;
-}
-
-.search-btn {
-    height: 45px;
-    width: 100px;
-    border: 1px solid mediumseagreen;
-    background-color: mediumseagreen;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    float: left;
-}
-
-.search-btn {
-    cursor: pointer
-}
 
 .search-select {
     position: absolute;

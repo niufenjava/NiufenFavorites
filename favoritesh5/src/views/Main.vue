@@ -29,17 +29,6 @@
               <el-menu-item index="/message">Message</el-menu-item>
             </el-menu>
           </el-col>
-          <el-col :span="4">
-            <el-switch
-              v-model="value2"
-              width="40"
-              style="margin-top:20px;"
-              active-color="#13ce66"
-              inactive-color="#ff4949"
-              active-icon-class="el-icon-platform-eleme"
-              inactive-icon-class="el-icon-eleme"
-            />
-          </el-col>
           <el-col :span="8">
 
             <search-engine />

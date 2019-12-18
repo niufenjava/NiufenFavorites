@@ -1,20 +1,22 @@
 <template>
   <div style="float:right;display: inline">
-    <el-button
-      size="mini"
+    <!-- 提供外部的编辑按钮 -->
+    <el-link
       type="primary"
+      icon="el-icon-edit"
       @click="open"
-    >
-      编辑
-    </el-button>
+    />
+
+    <!-- 抽屉 -->
     <el-drawer
+      with-header="false"
       title="编辑单词"
       size="80%"
       :visible.sync="drawer"
-      :direction="direction"
-      :before-close="handleClose"
+      direction="rtl"
+      :before-close="closeDrawerBefore"
     >
-
+      <!-- 抽屉显示区域 -->
       <el-container>
         <el-main
           :style="{ height: mainHeight+'px' }"
@@ -22,27 +24,28 @@
         >
           <el-row :gutter="20">
 
-            <!-- 我的词典详情显示区域 -->
-            <el-col :span="16">
-              <!-- 第一行，主要显示区域 -->
+            <!-- 左边一半-我的词典详情显示区域 -->
+            <el-col :span="12">
+
+              <!-- 第一行显示单词；和按钮 -->
               <el-row style="margin-bottom:20px">
-                <el-col :span="18">
+                <el-col :span="16">
                   <md-input
                     v-model="word.name"
                     placeholder="单词"
                   >Word</md-input>
                 </el-col>
                 <el-col
-                  :span="6"
-                  style="margin-top:15px"
+                  :span="8"
+                  style="margin-top:20px"
                 >
                   <el-button
-                    size="mini"
                     style="float:right;margin-right:15px"
-                    type="primary"
+                    type="success"
                     round
-                    @click="addExplain"
-                  >+解释</el-button>
+                    @click="saveWord"
+                  >保存</el-button>
+
                 </el-col>
               </el-row>
 
@@ -54,7 +57,10 @@
                     :style="{ height: mainHeight-120+'px' }"
                     style="height:500px;width:100%"
                   >
-
+                    <!-- 我是一个分割线 -->
+                    <el-row style="margin-top:20px;margin-bottom:20px;">
+                      <el-divider content-position="left">Explain</el-divider>
+                    </el-row>
                     <!-- 我是一个分割线 -->
                     <el-card
                       v-for="(explain,index) in word.explainList"
@@ -71,11 +77,12 @@
                       >
                         <div style="display:inline;width:80px">
                           <span>Explain {{ index+1 }}</span>
-                          <el-button
+                          <el-link
                             style="float: right; padding: 3px 0;display:inline;"
-                            type="text"
+                            type="danger"
                             @click="delExplain(index)"
-                          >删除</el-button>
+                          >delete
+                          </el-link>
                         </div>
 
                       </div>
@@ -133,33 +140,48 @@
                             </el-col>
                             <el-col
                               :span="4"
-                              style="margin-top:6px;"
+                              style="margin-top:10px;"
                             >
-                              <el-button
+                              <!-- 删除例子按钮 -->
+                              <el-link
+                                style="float:right"
                                 size="mini"
                                 type="danger"
-                                icon="el-icon-delete"
                                 @click="delExample(idx,explain.exampleList)"
-                              />
+                              >delete</el-link>
                             </el-col>
                           </el-row>
                         </li>
                       </ol>
-                      <div style="">
+
+                      <!-- 添加例子按钮 -->
+                      <div style="float: right;margin-right:20px;margin-bottom:20px;">
                         <el-button
                           style="float:middle"
                           size="mini"
-                          type="success"
+                          type="primary"
                           @click="addExample(explain.exampleList,explain)"
                         >+example</el-button>
                       </div>
                     </el-card>
 
+                    <el-row style="margin-bottom:20px;margin-top:20px;">
+                      <el-col
+                        :span="6"
+                        :offset="10"
+                      >
+                        <el-button
+                          size="mini"
+                          type="primary"
+                          round
+                          @click="addExplain"
+                        >+Explain</el-button>
+                      </el-col>
+                    </el-row>
                     <!-- 我是一个分割线 -->
-                    <el-divider
-                      style="margin-top:26px"
-                      content-position="left"
-                    >词根词缀</el-divider>
+                    <el-row style="margin-top:20px;margin-bottom:20px;">
+                      <el-divider content-position="left">词根词缀</el-divider>
+                    </el-row>
                     <!-- 词根词缀按OL展示 -->
                     <div>
                       <el-select
@@ -169,7 +191,7 @@
                         filterable
                         remote
                         reserve-keyword
-                        placeholder="请输入关键词"
+                        placeholder="词根词缀"
                         :remote-method="remoteMethod"
                         :loading="loading"
                       >
@@ -184,7 +206,7 @@
                     <!-- 记忆技巧 -->
                     <md-input
                       v-model="word.memonic.skill"
-                      style="margin-bottom:50px;"
+                      style="margin-bottom:50px;margin-top:50px"
                       placeholder="记忆技巧"
                     >记忆技巧</md-input>
 
@@ -196,7 +218,7 @@
             <!-- 百度翻译区域 -->
             <el-col
               :style="{ height: mainHeight-40+'px' }"
-              :span="8"
+              :span="12"
             >
               <el-container style="width:100%;height:100%">
                 <div style="width:100%;height:100%">
@@ -243,7 +265,7 @@ export default {
         'Wyoming'],
       mainHeight: 0,
       direction: 'rtl',
-      drawer: true,
+      drawer: false,
       activeNames: [0, 1, 2, 3, 4],
       value: null,
       iconClasses: ['icon-rate-face-1', 'icon-rate-face-2', 'icon-rate-face-3'], // 等同于 { 2: 'icon-rate-face-1', 4: { value: 'icon-rate-face-2', excluded: true }, 5: 'icon-rate-face-3' }
@@ -357,9 +379,12 @@ export default {
         this.options = []
       }
     },
-    handleClose () {
-
+    // 关闭抽屉前调用方法
+    closeDrawerBefore (done) {
+      done()
+      // this.drawer = false
     },
+    // 打开抽屉方法
     open () {
       this.drawer = true
     },
@@ -367,6 +392,10 @@ export default {
       // 动态修改样式
       console.log(clientHeight)
       this.mainHeight = (clientHeight - 50)
+    },
+    saveWord () {
+      console.info('保存单词逻辑')
+      console.info('this.word', this.word)
     }
   }
 }
@@ -397,6 +426,11 @@ export default {
   height: 1px;
   width: 100%;
   margin: 12px 0;
+}
+/* 分割线字体样式 */
+.el-divider__text {
+  font-weight: 500;
+  font-size: 20px;
 }
 /* 折叠面板样式 */
 .el-collapse-item__content {

@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-container style="border: 1px solid #eee">
+      <!-- 侧边栏 -->
       <el-scrollbar>
         <el-aside
           ref="wordAside"

@@ -1,0 +1,411 @@
+<template>
+  <div style="float:right;display: inline">
+    <el-button
+      size="mini"
+      type="primary"
+      @click="open"
+    >
+      编辑
+    </el-button>
+    <el-drawer
+      title="编辑单词"
+      size="80%"
+      :visible.sync="drawer"
+      :direction="direction"
+      :before-close="handleClose"
+    >
+
+      <el-container>
+        <el-main
+          :style="{ height: mainHeight+'px' }"
+          style="overflow: hidden;"
+        >
+          <el-row :gutter="20">
+
+            <!-- 我的词典详情显示区域 -->
+            <el-col :span="16">
+              <!-- 第一行，主要显示区域 -->
+              <el-row style="margin-bottom:20px">
+                <el-col :span="18">
+                  <md-input
+                    v-model="word.name"
+                    placeholder="单词"
+                  >Word</md-input>
+                </el-col>
+                <el-col
+                  :span="6"
+                  style="margin-top:15px"
+                >
+                  <el-button
+                    size="mini"
+                    style="float:right;margin-right:15px"
+                    type="primary"
+                    round
+                    @click="addExplain"
+                  >+解释</el-button>
+                </el-col>
+              </el-row>
+
+              <!-- 我是一个分割线 -->
+              <!-- 折叠面板。循环，单词详细解释 -->
+              <el-scrollbar>
+                <el-container>
+                  <div
+                    :style="{ height: mainHeight-120+'px' }"
+                    style="height:500px;width:100%"
+                  >
+
+                    <!-- 我是一个分割线 -->
+                    <el-card
+                      v-for="(explain,index) in word.explainList"
+                      :key="explain.id"
+                      :name="explain.id"
+                      class="box-card"
+                      shadow="hover"
+                      style="margin-bottom:10px;"
+                    >
+                      <!-- 单词详解-头部 -->
+                      <div
+                        slot="header"
+                        class="clearfix"
+                      >
+                        <div style="display:inline;width:80px">
+                          <span>Explain {{ index+1 }}</span>
+                          <el-button
+                            style="float: right; padding: 3px 0;display:inline;"
+                            type="text"
+                            @click="delExplain(index)"
+                          >删除</el-button>
+                        </div>
+
+                      </div>
+                      <el-row style="margin-bottom:10px;">
+                        <el-radio-group v-model="explain.type">
+                          <el-radio :label="1">n.</el-radio>
+                          <el-radio :label="2">v.</el-radio>
+                          <el-radio :label="3">adj.</el-radio>
+                          <el-radio :label="4">adv.</el-radio>
+                          <el-radio :label="5">prep.</el-radio>
+                          <el-radio :label="6">conj.</el-radio>
+                        </el-radio-group>
+                      </el-row>
+                      <!-- 单词详解 -->
+                      <el-row>
+                        <md-input
+                          v-model="explain.name"
+                          placeholder="解释"
+                        >解释</md-input>
+                      </el-row>
+                      <div>
+                        <div>
+                          <md-input
+                            v-model="explain.explainEn"
+                            style="margin-top:10px;"
+                            placeholder="explainEn"
+                          />
+                        </div>
+                        <div>
+                          <md-input
+                            v-model="explain.explainCn"
+                            style="margin-top:10px;"
+                            placeholder="explainCn"
+                          />
+                        </div>
+                      </div>
+                      <!-- 单词例子 -->
+                      <ol>
+                        <li
+                          v-for="(example, idx) in explain.exampleList"
+                          :key="example.id"
+                        >
+                          <md-input
+                            v-model="example.exampleEn"
+                            style="margin-top:10px;"
+                            placeholder="exampleEn"
+                          />
+                          <el-row>
+                            <el-col :span="20">
+                              <md-input
+                                v-model="example.exampleCn"
+                                style="margin-top:10px;"
+                                placeholder="exampleCn"
+                              />
+                            </el-col>
+                            <el-col
+                              :span="4"
+                              style="margin-top:6px;"
+                            >
+                              <el-button
+                                size="mini"
+                                type="danger"
+                                icon="el-icon-delete"
+                                @click="delExample(idx,explain.exampleList)"
+                              />
+                            </el-col>
+                          </el-row>
+                        </li>
+                      </ol>
+                      <div style="">
+                        <el-button
+                          style="float:middle"
+                          size="mini"
+                          type="success"
+                          @click="addExample(explain.exampleList,explain)"
+                        >+example</el-button>
+                      </div>
+                    </el-card>
+
+                    <!-- 我是一个分割线 -->
+                    <el-divider
+                      style="margin-top:26px"
+                      content-position="left"
+                    >词根词缀</el-divider>
+                    <!-- 词根词缀按OL展示 -->
+                    <div>
+                      <el-select
+                        v-model="selectValue"
+                        style="width:100%"
+                        multiple
+                        filterable
+                        remote
+                        reserve-keyword
+                        placeholder="请输入关键词"
+                        :remote-method="remoteMethod"
+                        :loading="loading"
+                      >
+                        <el-option
+                          v-for="item in options"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value"
+                        />
+                      </el-select>
+                    </div>
+                    <!-- 记忆技巧 -->
+                    <md-input
+                      v-model="word.memonic.skill"
+                      style="margin-bottom:50px;"
+                      placeholder="记忆技巧"
+                    >记忆技巧</md-input>
+
+                  </div>
+                </el-container>
+              </el-scrollbar>
+            </el-col>
+
+            <!-- 百度翻译区域 -->
+            <el-col
+              :style="{ height: mainHeight-40+'px' }"
+              :span="8"
+            >
+              <el-container style="width:100%;height:100%">
+                <div style="width:100%;height:100%">
+                  <baiduDist word="provide" />
+                </div>
+              </el-container>
+            </el-col>
+          </el-row>
+        </el-main>
+      </el-container>
+    </el-drawer>
+  </div>
+</template>
+<script>
+import baiduDist from '@/components/BaiduDist'
+import mdInput from '@/components/MDinput'
+export default {
+  components: {
+    baiduDist,
+    mdInput
+  },
+  data () {
+    return {
+      options: [],
+      selectValue: [],
+      list: [],
+      loading: false,
+      states: ['Alabama', 'Alaska', 'Arizona',
+        'Arkansas', 'California', 'Colorado',
+        'Connecticut', 'Delaware', 'Florida',
+        'Georgia', 'Hawaii', 'Idaho', 'Illinois',
+        'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+        'Louisiana', 'Maine', 'Maryland',
+        'Massachusetts', 'Michigan', 'Minnesota',
+        'Mississippi', 'Missouri', 'Montana',
+        'Nebraska', 'Nevada', 'New Hampshire',
+        'New Jersey', 'New Mexico', 'New York',
+        'North Carolina', 'North Dakota', 'Ohio',
+        'Oklahoma', 'Oregon', 'Pennsylvania',
+        'Rhode Island', 'South Carolina',
+        'South Dakota', 'Tennessee', 'Texas',
+        'Utah', 'Vermont', 'Virginia',
+        'Washington', 'West Virginia', 'Wisconsin',
+        'Wyoming'],
+      mainHeight: 0,
+      direction: 'rtl',
+      drawer: true,
+      activeNames: [0, 1, 2, 3, 4],
+      value: null,
+      iconClasses: ['icon-rate-face-1', 'icon-rate-face-2', 'icon-rate-face-3'], // 等同于 { 2: 'icon-rate-face-1', 4: { value: 'icon-rate-face-2', excluded: true }, 5: 'icon-rate-face-3' }
+      colors: ['#99A9BF', '#F7BA2A', '#FF9900'], // 等同于 { 2: '#99A9BF', 4: { value: '#F7BA2A', excluded: true }, 5: '#FF9900' }
+      word: {
+        name: 'provide',
+        symbol: 'prəˈvaɪd',
+        explainCn: 'v. 提供',
+        explainList: [
+          {
+            id: 0,
+            type: 'noun',
+            name: '提供',
+            explainEn: 'to give sth to sb or make it available for them to use',
+            explainCn: '给某人提供某物，并使其可用',
+            exampleList: [
+              {
+                id: 0,
+                exampleEn: 'We are here to provide a service for the public.',
+                exampleCn: '我们来这里是为公众服务。'
+              },
+              {
+                id: 1,
+                exampleEn:
+                  'The report was not expected to provide any answers. ',
+                exampleCn: '人们没有指望这个报告会提供什么答案。'
+              }
+            ]
+          },
+          {
+            id: 1,
+            type: 'adj',
+            name: '提供de',
+            explainEn: 'to give sth to sb or make it available for them to use',
+            explainCn: '给某人提供某物，并使其可用',
+            exampleList: [
+              {
+                id: 0,
+                exampleEn: 'We are here to provide a service for the public.',
+                exampleCn: '我们来这里是为公众服务。'
+              },
+              {
+                id: 1,
+                exampleEn:
+                  'The report was not expected to provide any answers. ',
+                exampleCn: '人们没有指望这个报告会提供什么答案。'
+              }
+            ]
+          }
+        ],
+        memonic: {
+          skill: 'pro 在前 + vid 看 + e → 提前看好 → 预备',
+          affixes: [
+            {
+              id: 1,
+              type: 1,
+              name: 'vid',
+              desc: '= to see 看'
+            },
+            {
+              id: 2,
+              type: 2,
+              name: 'pro',
+              desc: '向前'
+            }
+          ]
+        }
+      },
+      clientHeight: ''
+    }
+  },
+  created () {
+    this.clientHeight = `${document.documentElement.clientHeight}`
+    this.changeFixed(this.clientHeight)
+  },
+  mounted () {
+    this.list = this.states.map(item => {
+      return { value: `value:${item}`, label: `label:${item}` }
+    })
+  },
+
+  methods: {
+    addExplain () {
+      this.word.explainList.push({ exampleList: [] })
+    },
+    delExplain (index) {
+      this.word.explainList.splice(index, 1)
+    },
+    addExample (list, explain) {
+      if (list === undefined) {
+        list = []
+        explain.exampleList = []
+      }
+      console.info(list)
+      explain.exampleList.push({})
+    },
+    delExample (index, list) {
+      list.splice(index, 1)
+    },
+    remoteMethod (query) {
+      if (query !== '') {
+        this.loading = true
+        setTimeout(() => {
+          this.loading = false
+          this.options = this.list.filter(item => {
+            return item.label.toLowerCase()
+              .indexOf(query.toLowerCase()) > -1
+          })
+        }, 200)
+      } else {
+        this.options = []
+      }
+    },
+    handleClose () {
+
+    },
+    open () {
+      this.drawer = true
+    },
+    changeFixed (clientHeight) {
+      // 动态修改样式
+      console.log(clientHeight)
+      this.mainHeight = (clientHeight - 50)
+    }
+  }
+}
+</script>
+<style>
+/* 卡片头部样式 */
+.el-card__header {
+  padding: 5px 20px;
+  border-bottom: 1px solid #ebeef5;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+/* 抽屉头部样式 */
+.el-drawer__header {
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  color: #72767b;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin-bottom: 0px;
+  padding: 20px 20px 0;
+}
+/* 分割线样式 */
+.el-divider--horizontal {
+  display: block;
+  height: 1px;
+  width: 100%;
+  margin: 12px 0;
+}
+/* 折叠面板样式 */
+.el-collapse-item__content {
+  padding-bottom: 0;
+  font-size: 13px;
+  color: #303133;
+  line-height: 1.769230769230769;
+}
+ol {
+  padding-inline-start: 20px;
+}
+</style>

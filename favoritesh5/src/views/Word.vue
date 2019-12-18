@@ -1,22 +1,49 @@
 <template>
   <div>
+
     <el-container style="border: 1px solid #eee">
       <!-- 侧边栏 -->
-      <el-scrollbar>
-        <el-aside
-          ref="wordAside"
-          width="200px"
-          style="background-color: rgb(238, 241, 246)"
-        >
-          <div
-            v-for="item in wordList"
-            :key="item.id"
-            style="height: 30px;"
-          >
-            <el-link :underline="false">provide</el-link>
+      <el-aside
+        ref="wordAside"
+        width="200px"
+        style="background-color: rgb(238, 241, 246)"
+      >
+        <el-row>
+          <!-- prefix-icon="el-icon-search" -->
+          <el-input
+            v-model="searchInput"
+            style="display:inline;float:left;width:78%"
+            placeholder="请输入内容"
+            autocomplete="on"
+            clearable
+            @input="search"
+          />
+          <el-button
+            size="mini"
+            style="display:inline;float:right;margin-top:5px"
+            type="success"
+            @click="addWordClick"
+          >+</el-button>
+        </el-row>
+
+        <el-scrollbar ref="sideScroll">
+
+          <div ref="listRef">
+            <div
+              v-for="(item, index) in wordList"
+              :key="item.id"
+              :index="index"
+              style="height: 44px;margin-left:16px;"
+            >
+              <el-link
+                :underline="false"
+                :type="item.type"
+              >{{ item.name }}</el-link>
+            </div>
           </div>
-        </el-aside>
-      </el-scrollbar>
+        </el-scrollbar>
+
+      </el-aside>
       <el-container>
         <el-main
           ref="wordMain"
@@ -35,7 +62,11 @@
                   style="display:inline;margin-left:20px"
                   :colors="colors"
                 />
-                <editWord />
+                <el-link
+                  type="primary"
+                  icon="el-icon-edit"
+                  @click="editWordClick"
+                />
               </el-row>
 
               <!-- 单词简单解释 -->
@@ -124,7 +155,7 @@
             >
               <el-container style="width:100%;height:100%">
                 <div style="width:100%;height:100%">
-                  <baiduDist word="provide" />
+                  <baiduDist :word="word.name" />
                 </div>
               </el-container>
             </el-col>
@@ -132,6 +163,8 @@
         </el-main>
       </el-container>
     </el-container>
+    <editWord ref="editWordComp" />
+
   </div>
 </template>
 <script>
@@ -144,6 +177,7 @@ export default {
   },
   data () {
     return {
+      searchInput: null,
       activeNames: [0, 1, 2, 3, 4],
       value: null,
       iconClasses: ['icon-rate-face-1', 'icon-rate-face-2', 'icon-rate-face-3'], // 等同于 { 2: 'icon-rate-face-1', 4: { value: 'icon-rate-face-2', excluded: true }, 5: 'icon-rate-face-3' }
@@ -151,47 +185,47 @@ export default {
       wordList: [
         {
           id: 1,
-          name: 'provoide'
+          name: 'provoidea'
         },
         {
           id: 2,
-          name: 'provoide'
+          name: 'provoideb'
         },
         {
           id: 3,
-          name: 'provoide'
+          name: 'provoidec'
         },
         {
           id: 4,
-          name: 'provoide'
+          name: 'provoided'
         },
         {
           id: 5,
-          name: 'provoide'
+          name: 'provoidee'
         },
         {
           id: 6,
-          name: 'provoide'
+          name: 'provoidef'
         },
         {
           id: 7,
-          name: 'provoide'
+          name: 'provoideg'
         },
         {
           id: 8,
-          name: 'provoide'
+          name: 'provoideh'
         },
         {
           id: 9,
-          name: 'provoide'
+          name: 'provoideg'
         },
         {
           id: 10,
-          name: 'provoide'
+          name: 'provoideer'
         },
         {
           id: 11,
-          name: 'provoide'
+          name: 'provoideaaa'
         },
         {
           id: 12,
@@ -259,7 +293,7 @@ export default {
         },
         {
           id: 28,
-          name: 'provoide'
+          name: 'provoideaaa'
         },
         {
           id: 29,
@@ -275,7 +309,7 @@ export default {
         },
         {
           id: 32,
-          name: 'provoide'
+          name: 'provoide3'
         },
         {
           id: 33,
@@ -426,14 +460,52 @@ export default {
   },
 
   methods: {
+    editWordClick () {
+      this.$refs.editWordComp.open(1, null)
+    },
+    addWordClick () {
+      this.$refs.editWordComp.open(null, 'complex')
+    },
+    search () {
+      this.initSearch()
+      if (this.searchInput === null || this.searchInput === '') {
+        return
+      }
+      let scrollIndex = -1
+      for (let i = 0; i < this.wordList.length; i++) {
+        const word = this.wordList[i]
+        if (word.name.includes(this.searchInput, 0)) {
+          word.type = 'danger'
+          if (scrollIndex === -1) {
+            scrollIndex = i
+          }
+          if (word.name === this.searchInput) {
+            scrollIndex = i
+          }
+        }
+      }
+      for (let j = 0; j < this.$refs.listRef.children.length; j++) {
+        const element = this.$refs.listRef.children[j]
+        const attriIndex = element.getAttribute('index')
+        if (attriIndex + '' === scrollIndex + '') {
+          element.scrollIntoView()
+        }
+      }
+    },
+    initSearch () {
+      this.wordList.forEach(element => {
+        element.type = ''
+      })
+    },
     changeFixed (clientHeight) {
       // 动态修改样式
       // console.log(clientHeight);
       // console.log(this.$refs.baiduHeight.$el.style)
-      this.$refs.wordAside.$el.style.height = clientHeight - 65 + 'px'
-      this.$refs.wordMain.$el.style.height = clientHeight - 65 + 'px'
-      this.$refs.baiduHeight.$el.style.height = clientHeight - 85 + 'px'
-      this.$refs.wordDetailMain.style.height = clientHeight - 185 + 'px'
+      this.$refs.wordAside.$el.style.height = clientHeight - 165 + 'px'
+      this.$refs.listRef.style.height = clientHeight - 215 + 'px'
+      this.$refs.wordMain.$el.style.height = clientHeight - 165 + 'px'
+      this.$refs.baiduHeight.$el.style.height = clientHeight - 185 + 'px'
+      this.$refs.wordDetailMain.style.height = clientHeight - 285 + 'px'
     }
   }
 }

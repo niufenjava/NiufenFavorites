@@ -1,12 +1,6 @@
 <template>
   <div style="float:right;display: inline">
     <!-- 提供外部的编辑按钮 -->
-    <el-link
-      type="primary"
-      icon="el-icon-edit"
-      @click="open"
-    />
-
     <!-- 抽屉 -->
     <el-drawer
       with-header="false"
@@ -222,7 +216,7 @@
             >
               <el-container style="width:100%;height:100%">
                 <div style="width:100%;height:100%">
-                  <baiduDist word="provide" />
+                  <baiduDist :word="word.name" />
                 </div>
               </el-container>
             </el-col>
@@ -385,7 +379,10 @@ export default {
       // this.drawer = false
     },
     // 打开抽屉方法
-    open () {
+    open (id, word) {
+      if (id === null) {
+        this.word.name = word
+      }
       this.drawer = true
     },
     changeFixed (clientHeight) {

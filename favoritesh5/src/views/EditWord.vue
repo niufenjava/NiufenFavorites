@@ -23,11 +23,17 @@
 
               <!-- 第一行显示单词；和按钮 -->
               <el-row style="margin-bottom:20px">
-                <el-col :span="16">
+                <el-col :span="8">
                   <md-input
                     v-model="word.name"
                     placeholder="单词"
                   >Word</md-input>
+                </el-col>
+                <el-col :span="8">
+                  <md-input
+                    v-model="word.soundmark"
+                    placeholder="音标"
+                  >Soundmark</md-input>
                 </el-col>
                 <el-col
                   :span="8"
@@ -57,9 +63,9 @@
                     </el-row>
                     <!-- 我是一个分割线 -->
                     <el-card
-                      v-for="(explain,index) in word.explainList"
-                      :key="explain.id"
-                      :name="explain.id"
+                      v-for="(def,index) in word.defList"
+                      :key="def.id"
+                      :name="def.id"
                       class="box-card"
                       shadow="hover"
                       style="margin-bottom:10px;"
@@ -70,7 +76,7 @@
                         class="clearfix"
                       >
                         <div style="display:inline;width:80px">
-                          <span>Explain {{ index+1 }}</span>
+                          <span>Def {{ index+1 }}</span>
                           <el-link
                             style="float: right; padding: 3px 0;display:inline;"
                             type="danger"
@@ -81,42 +87,43 @@
 
                       </div>
                       <el-row style="margin-bottom:10px;">
-                        <el-radio-group v-model="explain.type">
+                        <el-radio-group v-model="def.type">
                           <el-radio :label="1">n.</el-radio>
                           <el-radio :label="2">v.</el-radio>
                           <el-radio :label="3">adj.</el-radio>
                           <el-radio :label="4">adv.</el-radio>
                           <el-radio :label="5">prep.</el-radio>
                           <el-radio :label="6">conj.</el-radio>
+                          <el-radio :label="7">phrase.</el-radio>
                         </el-radio-group>
                       </el-row>
                       <!-- 单词详解 -->
                       <el-row>
                         <md-input
-                          v-model="explain.name"
+                          v-model="def.name"
                           placeholder="解释"
                         >解释</md-input>
                       </el-row>
                       <div>
                         <div>
                           <md-input
-                            v-model="explain.explainEn"
+                            v-model="def.explainEn"
                             style="margin-top:10px;"
                             placeholder="explainEn"
                           />
                         </div>
                         <div>
                           <md-input
-                            v-model="explain.explainCn"
+                            v-model="def.explainCh"
                             style="margin-top:10px;"
-                            placeholder="explainCn"
+                            placeholder="explainCh"
                           />
                         </div>
                       </div>
                       <!-- 单词例子 -->
                       <ol>
                         <li
-                          v-for="(example, idx) in explain.exampleList"
+                          v-for="(example, idx) in def.exampleList"
                           :key="example.id"
                         >
                           <md-input
@@ -127,9 +134,9 @@
                           <el-row>
                             <el-col :span="20">
                               <md-input
-                                v-model="example.exampleCn"
+                                v-model="example.exampleCh"
                                 style="margin-top:10px;"
-                                placeholder="exampleCn"
+                                placeholder="exampleCh"
                               />
                             </el-col>
                             <el-col
@@ -141,7 +148,7 @@
                                 style="float:right"
                                 size="mini"
                                 type="danger"
-                                @click="delExample(idx,explain.exampleList)"
+                                @click="delExample(idx,def.exampleList)"
                               >delete</el-link>
                             </el-col>
                           </el-row>
@@ -154,7 +161,7 @@
                           style="float:middle"
                           size="mini"
                           type="primary"
-                          @click="addExample(explain.exampleList,explain)"
+                          @click="addExample(def.exampleList,def)"
                         >+example</el-button>
                       </div>
                     </el-card>
@@ -199,7 +206,7 @@
                     </div>
                     <!-- 记忆技巧 -->
                     <md-input
-                      v-model="word.memonic.skill"
+                      v-model="word.skillDesc"
                       style="margin-bottom:50px;margin-top:50px"
                       placeholder="记忆技巧"
                     >记忆技巧</md-input>
@@ -229,6 +236,7 @@
 <script>
 import baiduDist from '@/components/BaiduDist'
 import mdInput from '@/components/MDinput'
+import { dictApi } from '@/api/dict'
 export default {
   components: {
     baiduDist,
@@ -265,68 +273,13 @@ export default {
       iconClasses: ['icon-rate-face-1', 'icon-rate-face-2', 'icon-rate-face-3'], // 等同于 { 2: 'icon-rate-face-1', 4: { value: 'icon-rate-face-2', excluded: true }, 5: 'icon-rate-face-3' }
       colors: ['#99A9BF', '#F7BA2A', '#FF9900'], // 等同于 { 2: '#99A9BF', 4: { value: '#F7BA2A', excluded: true }, 5: '#FF9900' }
       word: {
-        name: 'provide',
-        symbol: 'prəˈvaɪd',
-        explainCn: 'v. 提供',
-        explainList: [
-          {
-            id: 0,
-            type: 'noun',
-            name: '提供',
-            explainEn: 'to give sth to sb or make it available for them to use',
-            explainCn: '给某人提供某物，并使其可用',
-            exampleList: [
-              {
-                id: 0,
-                exampleEn: 'We are here to provide a service for the public.',
-                exampleCn: '我们来这里是为公众服务。'
-              },
-              {
-                id: 1,
-                exampleEn:
-                  'The report was not expected to provide any answers. ',
-                exampleCn: '人们没有指望这个报告会提供什么答案。'
-              }
-            ]
-          },
-          {
-            id: 1,
-            type: 'adj',
-            name: '提供de',
-            explainEn: 'to give sth to sb or make it available for them to use',
-            explainCn: '给某人提供某物，并使其可用',
-            exampleList: [
-              {
-                id: 0,
-                exampleEn: 'We are here to provide a service for the public.',
-                exampleCn: '我们来这里是为公众服务。'
-              },
-              {
-                id: 1,
-                exampleEn:
-                  'The report was not expected to provide any answers. ',
-                exampleCn: '人们没有指望这个报告会提供什么答案。'
-              }
-            ]
-          }
+        name: '',
+        symbol: '',
+        descp: '',
+        defList: [
         ],
-        memonic: {
-          skill: 'pro 在前 + vid 看 + e → 提前看好 → 预备',
-          affixes: [
-            {
-              id: 1,
-              type: 1,
-              name: 'vid',
-              desc: '= to see 看'
-            },
-            {
-              id: 2,
-              type: 2,
-              name: 'pro',
-              desc: '向前'
-            }
-          ]
-        }
+        skillDesc: '',
+        etymaIdList: []
       },
       clientHeight: ''
     }
@@ -342,19 +295,30 @@ export default {
   },
 
   methods: {
+    wordInfo() {
+      dictApi.wordInfo(this.word.name).then(response => {
+        console.info(response)
+        this.word = response.word
+      }).catch(err => {
+        console.log(err)
+      })
+    },
     addExplain () {
-      this.word.explainList.push({ exampleList: [] })
+      if (this.word.defList === null) {
+        this.word.defList = []
+      }
+      this.word.defList.push({ exampleList: [] })
     },
     delExplain (index) {
-      this.word.explainList.splice(index, 1)
+      this.word.defList.splice(index, 1)
     },
-    addExample (list, explain) {
+    addExample (list, def) {
       if (list === undefined) {
         list = []
-        explain.exampleList = []
+        def.exampleList = []
       }
       console.info(list)
-      explain.exampleList.push({})
+      def.exampleList.push({})
     },
     delExample (index, list) {
       list.splice(index, 1)
@@ -375,6 +339,13 @@ export default {
     },
     // 关闭抽屉前调用方法
     closeDrawerBefore (done) {
+      // dictApi.wordCreateOrUpdate(this.word).then(response => {
+      //   // this.postForm = response.data
+
+      // }).catch(err => {
+      //   console.log(err)
+      // })
+      this.$emit('parentCallback')
       done()
       // this.drawer = false
     },
@@ -383,6 +354,7 @@ export default {
       if (id === null) {
         this.word.name = word
       }
+      this.wordInfo()
       this.drawer = true
     },
     changeFixed (clientHeight) {
@@ -393,6 +365,12 @@ export default {
     saveWord () {
       console.info('保存单词逻辑')
       console.info('this.word', this.word)
+      dictApi.wordCreateOrUpdate(this.word).then(response => {
+        console.info(response)
+        this.wordInfo()
+      }).catch(err => {
+        console.log(err)
+      })
     }
   }
 }

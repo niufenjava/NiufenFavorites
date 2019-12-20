@@ -1,6 +1,9 @@
 package io.renren.dict.service.impl;
 
+import io.renren.dict.entity.DictWordDefEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,6 +27,21 @@ public class DictWordDefExampleServiceImpl extends ServiceImpl<DictWordDefExampl
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void delByDefIds(List<Long> defIds){
+        this.remove(new QueryWrapper<DictWordDefExampleEntity>()
+                .in("def_id",defIds)
+        );
+    }
+
+    @Override
+    public List<DictWordDefExampleEntity> listByDefId(Long defId){
+        return this.list(
+                new QueryWrapper<DictWordDefExampleEntity>()
+                        .eq("def_id",defId)
+        );
     }
 
 }

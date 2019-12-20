@@ -13,6 +13,10 @@ import io.renren.dict.entity.DictWordEntity;
 import io.renren.dict.service.DictWordService;
 
 
+/**
+ *
+ * @author niufen
+ */
 @Service("dictWordService")
 public class DictWordServiceImpl extends ServiceImpl<DictWordDao, DictWordEntity> implements DictWordService {
 
@@ -24,6 +28,14 @@ public class DictWordServiceImpl extends ServiceImpl<DictWordDao, DictWordEntity
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public DictWordEntity getByName(String name){
+        return this.getOne(
+                new QueryWrapper<DictWordEntity>()
+                        .eq("name",name)
+        );
     }
 
 }

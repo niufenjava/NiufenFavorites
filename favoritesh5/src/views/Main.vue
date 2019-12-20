@@ -1,5 +1,5 @@
 <template>
-  <el-container style="border: 0px solid #eee;margin: 0px">
+  <el-container style="">
     <el-header height="60px">
       <el-row style="background-color:#24292e">
         <el-col :span="1">
@@ -35,10 +35,14 @@
         </el-col>
       </el-row>
     </el-header>
-    <el-main ref="homePage" style="padding: 0px">
+    <el-main
+      ref="homePage"
+      style="padding: 0px;"
+    >
       <router-view />
     </el-main>
-  </el-container></template>
+  </el-container>
+</template>
 <script>
 import logoUrl from '@/assets/logo.png'
 import SearchEngine from '@/components/searchEngine'
@@ -85,14 +89,15 @@ export default {
 </script>
 <style>
 .el-scrollbar__wrap {
-   overflow-x: hidden !important;
+  overflow-x: hidden !important;
 }
-  .el-select {
-    width: 100px;
-  }.el-input {
-    width: 150px;
-  }
-  .input-with-select .el-input-group__prepend {
-    background-color: #fff;
-  }
+.el-select {
+  width: 100px;
+}
+.el-input {
+  width: 150px;
+}
+.input-with-select .el-input-group__prepend {
+  background-color: #fff;
+}
 </style>

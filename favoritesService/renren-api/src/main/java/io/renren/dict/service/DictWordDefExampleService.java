@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.dict.entity.DictWordDefExampleEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +17,9 @@ import java.util.Map;
 public interface DictWordDefExampleService extends IService<DictWordDefExampleEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void delByDefIds(List<Long> defIds);
+
+    List<DictWordDefExampleEntity> listByDefId(Long defId);
 }
 

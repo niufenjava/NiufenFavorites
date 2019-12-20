@@ -16,5 +16,7 @@ import java.util.Map;
 public interface DictWordService extends IService<DictWordEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    DictWordEntity getByName(String name);
 }
 

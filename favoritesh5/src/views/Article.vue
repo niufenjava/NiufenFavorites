@@ -17,25 +17,44 @@
     </el-aside>
     <el-main>
       <el-row :gutter="20">
-        <el-col :span="8">
-          <video controls="" autoplay="" name="media"><source src="http://dict.youdao.com/dictvoice?audio=provide.&amp;le=eng" type="audio/mpeg"></video>
-          <quill-editor ref="myQuillEditor" v-model="content" :options="editorOption" @blur="onEditorBlur($event)" @focus="onEditorFocus($event)" @change="onEditorChange($event)" />
-          <button @click="saveHtml">保存</button>
+        <el-col :span="14">
+          <quill-editor
+            ref="myQuillEditor"
+            v-model="content"
+            :options="editorOption"
+            @blur="onEditorBlur($event)"
+            @focus="onEditorFocus($event)"
+            @change="onEditorChange($event)"
+          />
+          <el-button
+            type="success"
+            @click="saveHtml"
+          >保存</el-button>
         </el-col>
-        <el-col :span="8">
-          <quill-editor ref="myQuillEditor2" v-model="content2" :options="editorOption" @blur="onEditorBlur($event)" @focus="onEditorFocus($event)" @change="onEditorChange($event)" />
-          <button @click="saveHtml">保存</button>
-        </el-col>
-        <el-col :span="8">
-          <el-button type="primary" style="margin-left: 16px;" @click="drawer = true">
+        <el-col :span="10">
+          <el-button
+            type="primary"
+            style="margin-left: 16px;"
+            @click="drawer = true"
+          >
             点我打开
           </el-button>
           <el-card class="box-card">
-            <div slot="header" class="clearfix">
-              <span>introduce</span><span>   vt. 介绍；引进；提出；采用</span><span>   ˌɪntrəˈduːs</span>
-              <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
+            <div
+              slot="header"
+              class="clearfix"
+            >
+              <span>introduce</span><span> vt. 介绍；引进；提出；采用</span><span> ˌɪntrəˈduːs</span>
+              <el-button
+                style="float: right; padding: 3px 0"
+                type="text"
+              >操作按钮</el-button>
             </div>
-            <div v-for="o in 4" :key="o" class="text item">
+            <div
+              v-for="o in 4"
+              :key="o"
+              class="text item"
+            >
               {{ '列表内容 ' + o }}
             </div>
           </el-card>

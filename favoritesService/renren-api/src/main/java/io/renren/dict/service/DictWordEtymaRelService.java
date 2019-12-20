@@ -16,5 +16,7 @@ import java.util.Map;
 public interface DictWordEtymaRelService extends IService<DictWordEtymaRelEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void delByWordId(Long wordId);
 }
 

@@ -1,6 +1,7 @@
 package io.renren.dict.service.impl;
 
 import org.springframework.stereotype.Service;
+
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -26,4 +27,10 @@ public class DictWordEtymaRelServiceImpl extends ServiceImpl<DictWordEtymaRelDao
         return new PageUtils(page);
     }
 
+    @Override
+    public void delByWordId(Long wordId){
+        this.remove(new QueryWrapper<DictWordEtymaRelEntity>()
+                .eq("word_id",wordId)
+        );
+    }
 }

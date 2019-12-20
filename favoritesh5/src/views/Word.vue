@@ -38,6 +38,7 @@
               <el-link
                 :underline="false"
                 :type="item.type"
+                @click="clickWord(item.name)"
               >{{ item.name }}</el-link>
             </div>
           </div>
@@ -45,6 +46,7 @@
 
       </el-aside>
       <el-container>
+        <!-- v-if="word.name" -->
         <el-main
           ref="wordMain"
           style="overflow: hidden;"
@@ -56,13 +58,18 @@
               <!-- 第一行，主要显示区域 -->
               <el-row>
                 <span style="color:#409EFF;font-size:26px;font-weight:700">{{ word.name }}</span>
-                <code style="margin-left:20px;">[{{ word.symbol }}]</code>
+                <code style="margin-left:20px;">[{{ word.soundmark }}]</code>
                 <el-rate
-                  v-model="value"
+                  v-model="word.degree"
+                  show-text
                   style="display:inline;margin-left:20px"
-                  :colors="colors"
+                  :texts="rateTexts"
+                  :colors="rateColors"
+                  @change="rateChange"
                 />
+                <!-- 编辑按钮 -->
                 <el-link
+                  style="margin-right:30px;margin-top:10px;float:right"
                   type="primary"
                   icon="el-icon-edit"
                   @click="editWordClick"
@@ -71,11 +78,10 @@
 
               <!-- 单词简单解释 -->
               <el-row>
-                <span style="font-size:14px;">{{ word.explainCn }}</span>
+                <span style="font-size:14px;">{{ word.descp }}</span>
               </el-row>
 
               <!-- 我是一个分割线 -->
-              <el-divider />
               <!-- 折叠面板。循环，单词详细解释 -->
               <el-scrollbar>
                 <el-container>
@@ -85,41 +91,45 @@
                   >
 
                     <!-- 我是一个分割线 -->
-                    <el-divider content-position="left">Word Explain</el-divider>
-                    <el-collapse v-model="activeNames">
+                    <!-- <div style="margin-top:30px;margin-bottom:30px">
+
+                      <el-divider content-position="left">单词解释</el-divider>
+                    </div> -->
+                    <h4>单词解释</h4>
+                    <el-collapse v-model="collapseActiveIds">
                       <el-collapse-item
-                        v-for="explain in word.explainList"
-                        :key="explain.id"
-                        :name="explain.id"
+                        v-for="def in word.defList"
+                        :key="def.id"
+                        :name="def.id"
                       >
                         <!-- 单词详解-头部 -->
                         <template slot="title">
                           <div style="color: #E6A23C;font-size:16px">
-                            <span>{{ explain.type }}</span><span style="margin-left:10px">{{ explain.name }}</span>
+                            <span>{{ def.typeDesc }}</span><span style="margin-left:10px">{{ def.name }}</span>
                           </div>
                         </template>
 
                         <!-- 单词详解 -->
                         <div>
                           <div>
-                            <span>{{ explain.explainEn }}</span>
+                            <span>{{ def.explainEn }}</span>
                           </div>
                           <div>
-                            <span style="color: #909399">{{ explain.explainCn }}</span>
+                            <span style="color: #909399">{{ def.explainCh }}</span>
                           </div>
                         </div>
 
                         <!-- 单词例子 -->
                         <ol>
                           <li
-                            v-for="example in explain.exampleList"
+                            v-for="example in def.exampleList"
                             :key="example.id"
                           >
                             <div>
                               <span>{{ example.exampleEn }}</span>
                             </div>
                             <div>
-                              <span style="color: #909399">{{ example.exampleCn }}</span>
+                              <span style="color: #909399">{{ example.exampleCh }}</span>
                             </div>
                           </li>
                         </ol>
@@ -127,21 +137,24 @@
                     </el-collapse>
 
                     <!-- 我是一个分割线 -->
-                    <el-divider content-position="left">词根词缀</el-divider>
+                    <!-- <div style="margin-top:30px;margin-bottom:30px">
+                      <el-divider content-position="left">词根词缀</el-divider>
+                    </div> -->
+                    <h4>记忆技巧</h4>
                     <!-- 词根词缀按OL展示 -->
                     <div>
-                      <ol>
+                      <!-- <ol>
                         <li
                           v-for="item in word.memonic.affixes"
                           :key="item.id"
                         >
                           <el-tag type="success">前缀</el-tag><span>{{ item.name }}</span><span style="margin-left:20px;">{{ item.desc }}</span>
                         </li>
-                      </ol>
+                      </ol> -->
                     </div>
                     <!-- 记忆技巧 -->
                     <div>
-                      <span>{{ word.memonic.skill }}</span>
+                      <span>{{ word.skillDesc }}</span>
                     </div>
                   </div>
                 </el-container>
@@ -163,13 +176,17 @@
         </el-main>
       </el-container>
     </el-container>
-    <editWord ref="editWordComp" />
+    <editWord
+      ref="editWordComp"
+      @parentCallback="init"
+    />
 
   </div>
 </template>
 <script>
 import editWord from '@/views/EditWord.vue'
 import baiduDist from '@/components/BaiduDist'
+import { dictApi } from '@/api/dict'
 export default {
   components: {
     editWord,
@@ -178,267 +195,21 @@ export default {
   data () {
     return {
       searchInput: null,
-      activeNames: [0, 1, 2, 3, 4],
+      collapseActiveIds: [0, 1, 2, 3, 4],
       value: null,
       iconClasses: ['icon-rate-face-1', 'icon-rate-face-2', 'icon-rate-face-3'], // 等同于 { 2: 'icon-rate-face-1', 4: { value: 'icon-rate-face-2', excluded: true }, 5: 'icon-rate-face-3' }
-      colors: ['#99A9BF', '#F7BA2A', '#FF9900'], // 等同于 { 2: '#99A9BF', 4: { value: '#F7BA2A', excluded: true }, 5: '#FF9900' }
+      rateColors: ['#99A9BF', '#F7BA2A', '#FF9900'], // 等同于 { 2: '#99A9BF', 4: { value: '#F7BA2A', excluded: true }, 5: '#FF9900' }
+      rateTexts: ['未知', '失望', '一般', '良好', '掌握'],
       wordList: [
-        {
-          id: 1,
-          name: 'provoidea'
-        },
-        {
-          id: 2,
-          name: 'provoideb'
-        },
-        {
-          id: 3,
-          name: 'provoidec'
-        },
-        {
-          id: 4,
-          name: 'provoided'
-        },
-        {
-          id: 5,
-          name: 'provoidee'
-        },
-        {
-          id: 6,
-          name: 'provoidef'
-        },
-        {
-          id: 7,
-          name: 'provoideg'
-        },
-        {
-          id: 8,
-          name: 'provoideh'
-        },
-        {
-          id: 9,
-          name: 'provoideg'
-        },
-        {
-          id: 10,
-          name: 'provoideer'
-        },
-        {
-          id: 11,
-          name: 'provoideaaa'
-        },
-        {
-          id: 12,
-          name: 'provoide'
-        },
-        {
-          id: 13,
-          name: 'provoide'
-        },
-        {
-          id: 14,
-          name: 'provoide'
-        },
-        {
-          id: 15,
-          name: 'provoide'
-        },
-        {
-          id: 16,
-          name: 'provoide'
-        },
-        {
-          id: 17,
-          name: 'provoide'
-        },
-        {
-          id: 18,
-          name: 'provoide'
-        },
-        {
-          id: 19,
-          name: 'provoide'
-        },
-        {
-          id: 20,
-          name: 'provoide'
-        },
-        {
-          id: 21,
-          name: 'provoide'
-        },
-        {
-          id: 22,
-          name: 'provoide'
-        },
-        {
-          id: 23,
-          name: 'provoide'
-        },
-        {
-          id: 24,
-          name: 'provoide'
-        },
-        {
-          id: 25,
-          name: 'provoide'
-        },
-        {
-          id: 26,
-          name: 'provoide'
-        },
-        {
-          id: 27,
-          name: 'provoide'
-        },
-        {
-          id: 28,
-          name: 'provoideaaa'
-        },
-        {
-          id: 29,
-          name: 'provoide'
-        },
-        {
-          id: 30,
-          name: 'provoide'
-        },
-        {
-          id: 31,
-          name: 'provoide'
-        },
-        {
-          id: 32,
-          name: 'provoide3'
-        },
-        {
-          id: 33,
-          name: 'provoide'
-        }
       ],
       word: {
-        name: 'provide',
-        symbol: 'prəˈvaɪd',
-        explainCn: 'v. 提供',
-        explainList: [
-          {
-            id: 0,
-            type: 'noun',
-            name: '提供',
-            explainEn: 'to give sth to sb or make it available for them to use',
-            explainCn: '给某人提供某物，并使其可用',
-            exampleList: [
-              {
-                id: 0,
-                exampleEn: 'We are here to provide a service for the public.',
-                exampleCn: '我们来这里是为公众服务。'
-              },
-              {
-                id: 1,
-                exampleEn:
-                  'The report was not expected to provide any answers. ',
-                exampleCn: '人们没有指望这个报告会提供什么答案。'
-              }
-            ]
-          },
-          {
-            id: 1,
-            type: 'adj',
-            name: '提供de',
-            explainEn: 'to give sth to sb or make it available for them to use',
-            explainCn: '给某人提供某物，并使其可用',
-            exampleList: [
-              {
-                id: 0,
-                exampleEn: 'We are here to provide a service for the public.',
-                exampleCn: '我们来这里是为公众服务。'
-              },
-              {
-                id: 1,
-                exampleEn:
-                  'The report was not expected to provide any answers. ',
-                exampleCn: '人们没有指望这个报告会提供什么答案。'
-              }
-            ]
-          },
-          {
-            id: 2,
-            type: 'adj',
-            name: '提供de',
-            explainEn: 'to give sth to sb or make it available for them to use',
-            explainCn: '给某人提供某物，并使其可用',
-            exampleList: [
-              {
-                id: 0,
-                exampleEn: 'We are here to provide a service for the public.',
-                exampleCn: '我们来这里是为公众服务。'
-              },
-              {
-                id: 1,
-                exampleEn:
-                  'The report was not expected to provide any answers. ',
-                exampleCn: '人们没有指望这个报告会提供什么答案。'
-              }
-            ]
-          },
-          {
-            id: 3,
-            type: 'adj',
-            name: '提供de',
-            explainEn: 'to give sth to sb or make it available for them to use',
-            explainCn: '给某人提供某物，并使其可用',
-            exampleList: [
-              {
-                id: 0,
-                exampleEn: 'We are here to provide a service for the public.',
-                exampleCn: '我们来这里是为公众服务。'
-              },
-              {
-                id: 1,
-                exampleEn:
-                  'The report was not expected to provide any answers. ',
-                exampleCn: '人们没有指望这个报告会提供什么答案。'
-              }
-            ]
-          },
-          {
-            id: 4,
-            type: 'adj',
-            name: '提供de',
-            explainEn: 'to give sth to sb or make it available for them to use',
-            explainCn: '给某人提供某物，并使其可用',
-            exampleList: [
-              {
-                id: 0,
-                exampleEn: 'We are here to provide a service for the public.',
-                exampleCn: '我们来这里是为公众服务。'
-              },
-              {
-                id: 1,
-                exampleEn:
-                  'The report was not expected to provide any answers. ',
-                exampleCn: '人们没有指望这个报告会提供什么答案。'
-              }
-            ]
-          }
+        name: '',
+        symbol: '',
+        descp: '',
+        defList: [
         ],
-        memonic: {
-          skill: 'pro 在前 + vid 看 + e → 提前看好 → 预备',
-          affixes: [
-            {
-              id: 1,
-              type: 1,
-              name: 'vid',
-              desc: '= to see 看'
-            },
-            {
-              id: 2,
-              type: 2,
-              name: 'pro',
-              desc: '向前'
-            }
-          ]
-        }
+        skillDesc: '',
+        etymaIdList: []
       },
       clientHeight: ''
     }
@@ -448,6 +219,9 @@ export default {
     clientHeight: function () {
       this.changeFixed(this.clientHeight)
     }
+  },
+  created() {
+    this.wordListInit()
   },
   mounted () {
     // 获取浏览器可视区域高度
@@ -460,11 +234,45 @@ export default {
   },
 
   methods: {
+    rateChange() {
+      dictApi.wordDegree({ 'id': this.word.id, 'degree': this.word.degree }).then(response => {
+        console.info(response)
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    init() {
+      this.wordListInit()
+      this.wordInfo(this.word.name)
+    },
+    wordInfo(word) {
+      dictApi.wordInfo(word).then(response => {
+        console.info(response)
+        this.word = response.word
+        this.collapseActiveIds = []
+        for (let index = 0; index < this.word.defList.length; index++) {
+          const element = this.word.defList[index]
+          this.collapseActiveIds.push(element.id)
+        }
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    wordListInit() {
+      dictApi.wordList().then(response => {
+        this.wordList = response.wordList
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    clickWord(word) {
+      this.wordInfo(word)
+    },
     editWordClick () {
-      this.$refs.editWordComp.open(1, null)
+      this.$refs.editWordComp.open(null, this.word.name)
     },
     addWordClick () {
-      this.$refs.editWordComp.open(null, 'complex')
+      this.$refs.editWordComp.open(null, this.searchInput)
     },
     search () {
       this.initSearch()
@@ -524,6 +332,16 @@ export default {
   font-size: 13px;
   color: #303133;
   line-height: 1.769230769230769;
+}
+.el-divider__text {
+  font-weight: 500;
+  font-size: 18px;
+}
+.el-divider__text {
+  position: absolute;
+  background-color: #fff;
+  padding: 0 20px;
+  color: green;
 }
 ol {
   padding-inline-start: 20px;

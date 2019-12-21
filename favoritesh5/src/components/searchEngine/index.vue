@@ -3,15 +3,24 @@
     <div style="margin-top:0px;">
       <el-input
         v-model="keyword"
-        placeholder="请输入内容"
+        placeholder="搜索内容"
         @keyup="get($event)"
         @keydown.enter="search()"
         @keydown.down="selectDown()"
         @keydown.up.prevent="selectUp()"
       >
-
-        <el-button slot="prepend" size="medium" @click="switchEngine()">Google</el-button>
-        <el-button slot="append" icon="el-icon-search" @click="search()">Search</el-button>
+        <!--
+        <el-button
+          slot="prepend"
+          size="medium"
+          @click="switchEngine()"
+        >Baidu</el-button> -->
+        <el-button
+          slot="append"
+          type="primary"
+          icon="el-icon-search"
+          @click="search()"
+        >Baidu</el-button>
       </el-input>
     </div>
     <!-- <input v-model="keyword" type="text" @keyup="get($event)" @keydown.enter="search()" @keydown.down="selectDown()" @keydown.up.prevent="selectUp()"> -->
@@ -20,8 +29,20 @@
     <!-- <button class="search-btn" @click="search()">搜一下</button> -->
     <div class="search-select">
       <!-- transition-group也是vue2.0中的新特性,tag='ul'表示用ul包裹v-for出来的li -->
-      <transition-group v-cloak name="itemfade" tag="ul" mode="out-in">
-        <li v-for="(value,index) in myData" :key="value" :class="{selectback:index==now}" class="search-select-option search-select-list" @mouseover="selectHover(index)" @click="selectClick(index)">
+      <transition-group
+        v-cloak
+        name="itemfade"
+        tag="ul"
+        mode="out-in"
+      >
+        <li
+          v-for="(value,index) in myData"
+          :key="value"
+          :class="{selectback:index==now}"
+          class="search-select-option search-select-list"
+          @mouseover="selectHover(index)"
+          @click="selectClick(index)"
+        >
           {{ value }}
         </li>
       </transition-group>
@@ -117,67 +138,68 @@ export default {
 </script>
 
 <style type="text/css">
-
 .search-select {
-    position: absolute;
-    top: 45px;
-    width: 500px;
-    box-sizing: border-box;
-    z-index: 999;
+  position: absolute;
+  top: 45px;
+  width: 500px;
+  box-sizing: border-box;
+  z-index: 999;
 }
 
 .search-select li {
-    border: 1px solid #d4d4d4;
-    ;
-    border-top: none;
-    border-bottom: none;
-    background-color: #fff;
-    width: 100%
+  border: 1px solid #d4d4d4;
+  border-top: none;
+  border-bottom: none;
+  background-color: #fff;
+  width: 100%;
 }
 
 .search-select-option {
-    box-sizing: border-box;
-    padding: 7px 10px;
+  box-sizing: border-box;
+  padding: 7px 10px;
 }
 
 .selectback {
-    background-color: #eee !important;
-    cursor: pointer
+  background-color: #eee !important;
+  cursor: pointer;
 }
 
 input::-ms-clear {
-    display: none
+  display: none;
 }
 
 .search-reset {
-    width: 21px;
-    height: 21px;
-    position: absolute;
-    display: block;
-    line-height: 21px;
-    text-align: center;
-    cursor: pointer;
-    font-size: 20px;
-    right: 110px;
-    top: 12px
+  width: 21px;
+  height: 21px;
+  position: absolute;
+  display: block;
+  line-height: 21px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 20px;
+  right: 110px;
+  top: 12px;
 }
 
 .search-select-list {
-    transition: all 0.5s
+  transition: all 0.5s;
 }
 
 .itemfade-enter,
 .itemfade-leave-active {
-    opacity: 0;
+  opacity: 0;
 }
 
 .itemfade-leave-active {
-    position: absolute;
+  position: absolute;
 }
 
 .selectback {
-    background-color: #eee !important;
-    cursor: pointer
+  background-color: #eee !important;
+  cursor: pointer;
 }
-.search-select ul{margin:0;text-align: left; }
+.search-select ul {
+  margin: 0;
+  text-align: left;
+}
 </style>

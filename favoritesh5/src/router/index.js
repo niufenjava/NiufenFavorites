@@ -6,60 +6,60 @@ import Main from '../views/Main.vue'
 Vue.use(VueRouter)
 
 const routes = [{
-  path: '/',
-  component: Main,
-  redirect: '/webSite',
-  children: [{
-    path: 'webSite',
-    component: WebSite,
-    name: 'WebSite'
-  }]
-},
-{
-  path: '/',
-  component: Main,
-  children: [{
-    path: '/message',
-    component: () => import('@/views/Message.vue'),
-    name: 'Message'
-  }]
-},
-{
-  path: '/',
-  component: Main,
-  children: [{
-    path: '/home',
-    component: () => import('@/views/Home.vue'),
-    name: 'Home'
-  }]
-},
-{
-  path: '/',
-  component: Main,
-  children: [{
-    path: '/todo',
-    component: Todo,
-    name: 'Todo'
-  }]
-},
-{
-  path: '/',
-  component: Main,
-  children: [{
-    path: '/word',
-    component: () => import('@/views/Word.vue'),
-    name: 'Word'
-  }]
-},
-{
-  path: '/',
-  component: Main,
-  children: [{
-    path: '/article',
-    component: () => import('@/views/Article.vue'),
-    name: 'Article'
-  }]
-}
+    path: '/',
+    component: Main,
+    redirect: '/webSite',
+    children: [{
+      path: 'webSite',
+      component: WebSite,
+      name: 'WebSite'
+    }]
+  },
+  {
+    path: '/',
+    component: Main,
+    children: [{
+      path: '/message',
+      component: () => import('@/views/Message.vue'),
+      name: 'Message'
+    }]
+  },
+  {
+    path: '/',
+    component: Main,
+    children: [{
+      path: '/home',
+      component: () => import('@/views/Home.vue'),
+      name: 'Home'
+    }]
+  },
+  {
+    path: '/',
+    component: Main,
+    children: [{
+      path: '/todo',
+      component: Todo,
+      name: 'Todo'
+    }]
+  },
+  {
+    path: '/',
+    component: Main,
+    children: [{
+      path: '/word',
+      component: () => import('@/views/Word.vue'),
+      name: 'Word'
+    }]
+  },
+  {
+    path: '/',
+    component: Main,
+    children: [{
+      path: '/notebook',
+      component: () => import('@/views/Notebook.vue'),
+      name: 'Notebook'
+    }]
+  }
 ]
 
 const router = new VueRouter({

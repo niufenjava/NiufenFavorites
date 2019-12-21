@@ -1,18 +1,14 @@
 <template>
-  <el-container style="">
-    <el-header height="60px">
-      <el-row style="background-color:#24292e">
-        <el-col :span="1">
-          <div style="height:60px;width:100%">
-            <a href="#/home">
-              <el-image
-                style="width: 32px; height: 32px;margin-top:12px;margin-left:12px;"
-                :src="logoUrl"
-              />
-            </a>
-          </div>
-        </el-col>
-        <el-col :span="15">
+  <el-container>
+    <!-- 布局-头部导航 -->
+    <el-header
+      height="60px"
+      style="background-color:#24292e;opacity: 1;"
+    >
+      <el-row>
+
+        <!-- 导航菜单 -->
+        <el-col :span="16">
           <el-menu
             default-active="/webSite"
             router
@@ -20,26 +16,37 @@
             mode="horizontal"
             background-color="#24292e"
             text-color="#fff"
-            active-text-color="#ffd04b"
-            style="border: 0px"
+            active-text-color="#feac5e"
+            style="border: 0px;"
           >
+            <el-menu-item index="/home">
+              <el-image
+                style="width: 32px; height: 32px;"
+                :src="logoUrl"
+              />
+            </el-menu-item>
+            <el-menu-item index="/word">Word</el-menu-item>
+            <el-menu-item index="/notebook">Notebook</el-menu-item>
             <el-menu-item index="/webSite">WebSite</el-menu-item>
             <el-menu-item index="/todo">Todo</el-menu-item>
             <el-menu-item index="/message">Message</el-menu-item>
-            <el-menu-item index="/word">记单词</el-menu-item>
-            <el-menu-item index="/article">文章</el-menu-item>
           </el-menu>
         </el-col>
-        <el-col :span="6">
-          <search-engine />
+
+        <!-- 百度搜索 -->
+        <el-col :span="8">
+          <search-engine style="margin-top:10px;margin-right:20px;" />
         </el-col>
       </el-row>
     </el-header>
+
+    <!-- 布局-主体 -->
     <el-main
       ref="homePage"
-      style="padding: 0px;"
+      style="padding: 0px"
     >
-      <router-view />
+      <!-- 路由显示区 -->
+      <router-view style="height:100%;" />
     </el-main>
   </el-container>
 </template>
@@ -52,9 +59,7 @@ export default {
   },
   data () {
     return {
-      select: 'Baidu',
-      value2: true,
-      inputValue: '',
+      // 用于计算主体高度
       clientHeight: '',
       logoUrl: logoUrl
     }
@@ -68,17 +73,14 @@ export default {
   mounted () {
     // 获取浏览器可视区域高度
     this.clientHeight = `${document.documentElement.clientHeight}`
-    // document.body.clientWidth;
-    // console.log(self.clientHeight);
     window.onresize = function temp () {
       this.clientHeight = `${document.documentElement.clientHeight}`
     }
   },
 
   methods: {
-    changeFixed (clientHeight) { // 动态修改样式
-      // console.log(clientHeight);
-      // console.log(this.$refs.homePage.$el.style.height);
+     // 动态修改样式
+    changeFixed (clientHeight) {
       this.$refs.homePage.$el.style.height = clientHeight - 60 + 'px'
     },
     route (path) {
@@ -88,16 +90,4 @@ export default {
 }
 </script>
 <style>
-.el-scrollbar__wrap {
-  overflow-x: hidden !important;
-}
-.el-select {
-  width: 100px;
-}
-.el-input {
-  width: 150px;
-}
-.input-with-select .el-input-group__prepend {
-  background-color: #fff;
-}
 </style>

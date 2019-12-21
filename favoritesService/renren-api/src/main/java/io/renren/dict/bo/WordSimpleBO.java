@@ -25,4 +25,8 @@ public class WordSimpleBO implements Serializable {
      * 单词名称
      */
     private String name;
+    /**
+     * 单词名称
+     */
+    private String descp;
 }

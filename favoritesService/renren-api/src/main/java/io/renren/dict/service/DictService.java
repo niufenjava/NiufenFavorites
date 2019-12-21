@@ -58,7 +58,7 @@ public class DictService {
                 WordSimpleBO simpleBO = new WordSimpleBO();
                 simpleBO.setId(wordEntity.getId());
                 simpleBO.setName(wordEntity.getName());
-
+                simpleBO.setDescp("n. 抽象；");
                 wordNameList.add(simpleBO);
             }
         }

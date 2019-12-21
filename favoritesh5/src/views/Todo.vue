@@ -1,5 +1,5 @@
 <template>
-  <div>TODO</div>
+  <div style="background-color">TODO</div>
 </template>
 <script>
 export default {
@@ -22,5 +22,4 @@ export default {
 }
 </script>
 <style>
-
 </style>

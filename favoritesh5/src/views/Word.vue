@@ -1,95 +1,121 @@
 <template>
   <div>
-
-    <el-container style="border: 1px solid #eee">
+    <el-container style="height:100%">
       <!-- 侧边栏 -->
       <el-aside
-        ref="wordAside"
-        width="200px"
-        style="background-color: rgb(238, 241, 246)"
+        width="220px"
+        style="hegiht:100%;"
       >
+        <!-- 新增单词按钮 -->
         <el-row>
-          <!-- prefix-icon="el-icon-search" -->
+          <el-col :span="12">
+            <el-button
+              size="small"
+              style="margin:10px"
+              type="primary"
+              @click="addWordClick"
+            >新增单词</el-button>
+          </el-col>
+          <el-col :span="12">
+            <el-dropdown
+              size="small"
+              style="float:right;margin-top:15px;"
+            >
+              <span class="el-dropdown-link">
+                默认排序<i class="el-icon-arrow-down el-icon--right" />
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>默认排序</el-dropdown-item>
+                <el-dropdown-item>熟悉程度</el-dropdown-item>
+                <el-dropdown-item>查询次数</el-dropdown-item>
+                <el-dropdown-item>修改时间</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </el-col>
+        </el-row>
+
+        <!-- 单词搜索输入框 -->
+        <el-row>
           <el-input
             v-model="searchInput"
-            style="display:inline;float:left;width:78%"
-            placeholder="请输入内容"
+            style="margin:10px;width:200px;margin-top:0px;"
+            placeholder="Search"
             autocomplete="on"
             clearable
             @input="search"
           />
-          <el-button
-            size="mini"
-            style="display:inline;float:right;margin-top:5px"
-            type="success"
-            @click="addWordClick"
-          >+</el-button>
         </el-row>
-
-        <el-scrollbar ref="sideScroll">
+        <el-scrollbar>
 
           <div ref="listRef">
             <div
               v-for="(item, index) in wordList"
               :key="item.id"
               :index="index"
-              style="height: 44px;margin-left:16px;"
+              style="height: 34px;margin-left:14px;"
             >
               <el-link
-                :underline="false"
+                :underline="true"
                 :type="item.type"
+                style="font-size:18px;font-weight:500px;"
                 @click="clickWord(item.name)"
               >{{ item.name }}</el-link>
             </div>
+
           </div>
         </el-scrollbar>
 
       </el-aside>
-      <el-container>
-        <!-- v-if="word.name" -->
-        <el-main
-          ref="wordMain"
-          style="overflow: hidden;"
+      <!-- v-if="word.name" -->
+      <el-main
+        ref="wordMain"
+        style="overflow: hidden;height:100%"
+      >
+        <el-row
+          style="height:100%"
+          :gutter="20"
         >
-          <el-row :gutter="20">
 
-            <!-- 我的词典详情显示区域 -->
-            <el-col :span="12">
-              <!-- 第一行，主要显示区域 -->
-              <el-row>
-                <span style="color:#409EFF;font-size:26px;font-weight:700">{{ word.name }}</span>
-                <code style="margin-left:20px;">[{{ word.soundmark }}]</code>
-                <el-rate
-                  v-model="word.degree"
-                  show-text
-                  style="display:inline;margin-left:20px"
-                  :texts="rateTexts"
-                  :colors="rateColors"
-                  @change="rateChange"
-                />
-                <!-- 编辑按钮 -->
-                <el-link
-                  style="margin-right:30px;margin-top:10px;float:right"
-                  type="primary"
-                  icon="el-icon-edit"
-                  @click="editWordClick"
-                />
-              </el-row>
+          <!-- 我的词典详情显示区域 -->
+          <el-col :span="myWordCol">
+            <el-row>
+              <el-rate
+                v-model="word.degree"
+                style="display:inline;margin-left:20px;float:right"
+                :texts="rateTexts"
+                :colors="rateColors"
+                @change="rateChange"
+              />
 
-              <!-- 单词简单解释 -->
-              <el-row>
-                <span style="font-size:14px;">{{ word.descp }}</span>
-              </el-row>
+            </el-row>
+            <!-- 第一行，主要显示区域 -->
+            <el-row>
+              <span style="color:#409eff;font-size:30px;font-weight:800">{{ word.name }}</span>
+              <code style="margin-left:20px;">[{{ word.soundmark }}]</code>
 
-              <!-- 我是一个分割线 -->
-              <!-- 折叠面板。循环，单词详细解释 -->
+              <!-- 编辑按钮 -->
+              <el-link
+                style="margin-right:10px;margin-top:20px;float:right"
+                type="default"
+                icon="el-icon-edit"
+                @click="editWordClick"
+              >编辑</el-link>
+            </el-row>
+
+            <!-- 单词简单解释 -->
+            <el-row>
+              <span style="font-size:14px;">{{ word.descp }}</span>
+            </el-row>
+
+            <!-- 我是一个分割线 -->
+            <!-- 折叠面板。循环，单词详细解释 -->
+            <el-row style="background-color:white;margin-top:10px;">
               <el-scrollbar>
-                <el-container>
-                  <div
-                    ref="wordDetailMain"
-                    style="height:500px;width:100%"
-                  >
-
+                <div
+                  ref="wordDetailMain"
+                  style="width:100%;"
+                >
+                  <div style="margin:20px;">
                     <!-- 我是一个分割线 -->
                     <!-- <div style="margin-top:30px;margin-bottom:30px">
 
@@ -142,8 +168,7 @@
                     </div> -->
                     <h4>记忆技巧</h4>
                     <!-- 词根词缀按OL展示 -->
-                    <div>
-                      <!-- <ol>
+                    <!-- <ol>
                         <li
                           v-for="item in word.memonic.affixes"
                           :key="item.id"
@@ -151,49 +176,52 @@
                           <el-tag type="success">前缀</el-tag><span>{{ item.name }}</span><span style="margin-left:20px;">{{ item.desc }}</span>
                         </li>
                       </ol> -->
-                    </div>
                     <!-- 记忆技巧 -->
-                    <div>
+                    <div style="background-color:white;margin-bottom:200px;">
                       <span>{{ word.skillDesc }}</span>
                     </div>
                   </div>
-                </el-container>
-              </el-scrollbar>
-            </el-col>
-
-            <!-- 百度翻译区域 -->
-            <el-col
-              ref="baiduHeight"
-              :span="12"
-            >
-              <el-container style="width:100%;height:100%">
-                <div style="width:100%;height:100%">
-                  <baiduDist :word="word.name" />
                 </div>
-              </el-container>
-            </el-col>
-          </el-row>
-        </el-main>
-      </el-container>
+              </el-scrollbar>
+            </el-row>
+          </el-col>
+
+          <!-- 百度翻译区域 -->
+          <el-col
+            ref="thirdDictHeight"
+            :span="thirdWordCol"
+          >
+            <el-container style="width:100%;height:100%">
+              <div style="width:100%;height:100%">
+                <thirdDict ref="thirdDictRef" />
+              </div>
+            </el-container>
+          </el-col>
+        </el-row>
+      </el-main>
+
+      <!-- 单词编辑-组件 -->
+      <editWord
+        ref="editWordComp"
+        @parentCallback="init"
+      />
     </el-container>
-    <editWord
-      ref="editWordComp"
-      @parentCallback="init"
-    />
 
   </div>
 </template>
 <script>
 import editWord from '@/views/EditWord.vue'
-import baiduDist from '@/components/BaiduDist'
+import thirdDict from '@/components/ThirdDict'
 import { dictApi } from '@/api/dict'
 export default {
   components: {
     editWord,
-    baiduDist
+    thirdDict
   },
   data () {
     return {
+      myWordCol: 12,
+      thirdWordCol: 12,
       searchInput: null,
       collapseActiveIds: [0, 1, 2, 3, 4],
       value: null,
@@ -218,6 +246,9 @@ export default {
     // 如果 `clientHeight` 发生改变，这个函数就会运行
     clientHeight: function () {
       this.changeFixed(this.clientHeight)
+    },
+    word: function () {
+      this.$refs.thirdDictRef.open(this.word.name)
     }
   },
   created() {
@@ -250,10 +281,12 @@ export default {
         console.info(response)
         this.word = response.word
         this.collapseActiveIds = []
+        if (this.word.defList) {
         for (let index = 0; index < this.word.defList.length; index++) {
           const element = this.word.defList[index]
           this.collapseActiveIds.push(element.id)
         }
+      }
       }).catch(err => {
         console.log(err)
       })
@@ -261,11 +294,19 @@ export default {
     wordListInit() {
       dictApi.wordList().then(response => {
         this.wordList = response.wordList
+        this.word = this.wordList[0]
       }).catch(err => {
         console.log(err)
       })
     },
     clickWord(word) {
+      this.initSearch()
+      for (let i = 0; i < this.wordList.length; i++) {
+        const item = this.wordList[i]
+        if (item.name === word) {
+          item.type = 'primary'
+        }
+      }
       this.wordInfo(word)
     },
     editWordClick () {
@@ -302,18 +343,18 @@ export default {
     },
     initSearch () {
       this.wordList.forEach(element => {
-        element.type = ''
+        element.type = 'default'
       })
     },
     changeFixed (clientHeight) {
       // 动态修改样式
       // console.log(clientHeight);
       // console.log(this.$refs.baiduHeight.$el.style)
-      this.$refs.wordAside.$el.style.height = clientHeight - 165 + 'px'
-      this.$refs.listRef.style.height = clientHeight - 215 + 'px'
-      this.$refs.wordMain.$el.style.height = clientHeight - 165 + 'px'
-      this.$refs.baiduHeight.$el.style.height = clientHeight - 185 + 'px'
-      this.$refs.wordDetailMain.style.height = clientHeight - 285 + 'px'
+      // this.$refs.wordAside.$el.style.height = clientHeight - 165 + 'px'
+      this.$refs.listRef.style.height = clientHeight - 190 + 'px'
+      // this.$refs.wordMain.$el.style.height = clientHeight - 160 + 'px'
+      this.$refs.thirdDictHeight.$el.style.height = clientHeight - 125 + 'px'
+      this.$refs.wordDetailMain.style.height = clientHeight - 240 + 'px'
     }
   }
 }
@@ -325,6 +366,7 @@ export default {
   height: 1px;
   width: 100%;
   margin: 12px 0;
+  margin-bottom: 20px;
 }
 /* 折叠面板样式 */
 .el-collapse-item__content {
@@ -339,11 +381,25 @@ export default {
 }
 .el-divider__text {
   position: absolute;
-  background-color: #fff;
+  background-color: rgb(238, 241, 246);
   padding: 0 20px;
-  color: green;
 }
 ol {
   padding-inline-start: 20px;
+}
+.el-link.el-link--default {
+  color: black;
+}
+.el-link.el-link--primary:hover {
+  color: #409eff;
+}
+.el-link.el-link--primary {
+  color: #409eff;
+}
+.el-collapse-item__content {
+  padding-bottom: 0;
+  font-size: 16px;
+  color: #303133;
+  line-height: 1.769230769230769;
 }
 </style>

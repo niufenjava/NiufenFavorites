@@ -158,4 +158,43 @@ CREATE TABLE `t_dict_word_etyma_rel` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='字典-单词词源关联表';
 
+
+DROP TABLE IF EXISTS `t_note`;
+CREATE TABLE `t_note` (
+                               `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+                               `parent_id` bigint(20) unsigned NULL COMMENT '父节点ID',
+                               `name` varchar(255) NOT NULL COMMENT '笔记名称',
+                               `type` smallint(4) DEFAULT NULL COMMENT '节点类型',
+                               `descp` text COMMENT '描述/备注',
+                               `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                               `modify_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+                               PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='笔记本-笔记';
+
+
+
+DROP TABLE IF EXISTS `t_note_content`;
+CREATE TABLE `t_note_content` (
+                          `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+                          `note_id` bigint(20) unsigned NULL COMMENT '笔记节点ID',
+                          `content` text NOT NULL COMMENT '笔记内容',
+                          `type` smallint(4) DEFAULT NULL COMMENT '笔记内容类型',
+                          `descp` text COMMENT '描述/备注',
+                          `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                          `modify_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+                          PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='笔记本-笔记内容';
+
+DROP TABLE IF EXISTS `t_note_word_rel`;
+CREATE TABLE `t_note_word_rel` (
+                          `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+                          `note_id` bigint(20) unsigned NULL COMMENT '笔记节点ID',
+                          `word_id` text NOT NULL COMMENT '笔记内容',
+                          `type` smallint(4) DEFAULT NULL COMMENT '笔记内容类型',
+                          `descp` text COMMENT '描述/备注',
+                          `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                          `modify_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+                          PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='笔记本-笔记内容-单词关联表';
+
 SET FOREIGN_KEY_CHECKS = 1;

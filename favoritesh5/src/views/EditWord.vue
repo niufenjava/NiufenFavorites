@@ -27,6 +27,7 @@
                   <md-input
                     v-model="word.name"
                     placeholder="单词"
+                    @blur="wordChange"
                   >Word</md-input>
                 </el-col>
                 <el-col :span="8">
@@ -58,9 +59,7 @@
                     style="height:500px;width:100%"
                   >
                     <!-- 我是一个分割线 -->
-                    <el-row style="margin-top:20px;margin-bottom:20px;">
-                      <el-divider content-position="left">Explain</el-divider>
-                    </el-row>
+                    <h3>单词解释</h3>
                     <!-- 我是一个分割线 -->
                     <el-card
                       v-for="(def,index) in word.defList"
@@ -76,7 +75,7 @@
                         class="clearfix"
                       >
                         <div style="display:inline;width:80px">
-                          <span>Def {{ index+1 }}</span>
+                          <span> {{ def.name }}</span>
                           <el-link
                             style="float: right; padding: 3px 0;display:inline;"
                             type="danger"
@@ -101,25 +100,26 @@
                       <el-row>
                         <md-input
                           v-model="def.name"
-                          placeholder="解释"
-                        >解释</md-input>
+                          placeholder="definition"
+                        >释义</md-input>
                       </el-row>
                       <div>
                         <div>
                           <md-input
                             v-model="def.explainEn"
-                            style="margin-top:10px;"
+                            style="margin-top:50px;"
                             placeholder="explainEn"
-                          />
+                          >英文解释</md-input>
                         </div>
                         <div>
                           <md-input
                             v-model="def.explainCh"
-                            style="margin-top:10px;"
+                            style="margin-top:50px;"
                             placeholder="explainCh"
-                          />
+                          >中文解释</md-input>
                         </div>
                       </div>
+                      <h4>例子</h4>
                       <!-- 单词例子 -->
                       <ol>
                         <li
@@ -180,9 +180,7 @@
                       </el-col>
                     </el-row>
                     <!-- 我是一个分割线 -->
-                    <el-row style="margin-top:20px;margin-bottom:20px;">
-                      <el-divider content-position="left">词根词缀</el-divider>
-                    </el-row>
+                    <h3>单词记忆</h3>
                     <!-- 词根词缀按OL展示 -->
                     <div>
                       <el-select
@@ -223,7 +221,7 @@
             >
               <el-container style="width:100%;height:100%">
                 <div style="width:100%;height:100%">
-                  <baiduDist :word="word.name" />
+                  <thirdDict ref="thirdDictRef" />
                 </div>
               </el-container>
             </el-col>
@@ -234,12 +232,13 @@
   </div>
 </template>
 <script>
-import baiduDist from '@/components/BaiduDist'
+import thirdDict from '@/components/ThirdDict'
+
 import mdInput from '@/components/MDinput'
 import { dictApi } from '@/api/dict'
 export default {
   components: {
-    baiduDist,
+    thirdDict,
     mdInput
   },
   data () {
@@ -268,6 +267,7 @@ export default {
       mainHeight: 0,
       direction: 'rtl',
       drawer: false,
+      wordName: '',
       activeNames: [0, 1, 2, 3, 4],
       value: null,
       iconClasses: ['icon-rate-face-1', 'icon-rate-face-2', 'icon-rate-face-3'], // 等同于 { 2: 'icon-rate-face-1', 4: { value: 'icon-rate-face-2', excluded: true }, 5: 'icon-rate-face-3' }
@@ -284,6 +284,15 @@ export default {
       clientHeight: ''
     }
   },
+  watch: {
+    // 如果 `clientHeight` 发生改变，这个函数就会运行
+    clientHeight: function () {
+      this.changeFixed(this.clientHeight)
+    },
+    wordName: function () {
+      this.$refs.thirdDictRef.open(this.wordName)
+    }
+  },
   created () {
     this.clientHeight = `${document.documentElement.clientHeight}`
     this.changeFixed(this.clientHeight)
@@ -295,10 +304,14 @@ export default {
   },
 
   methods: {
+    wordChange() {
+      this.wordName = this.word.name
+    },
     wordInfo() {
       dictApi.wordInfo(this.word.name).then(response => {
         console.info(response)
         this.word = response.word
+        this.wordName = this.word.name
       }).catch(err => {
         console.log(err)
       })

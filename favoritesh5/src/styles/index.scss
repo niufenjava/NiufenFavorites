@@ -1,0 +1,40 @@
+@import './var.scss';
+
+body {
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+
+  display: block;
+  margin: 0px;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to left,
+      #4bc0c8,
+      #c779d0,
+      #feac5e);
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to left,
+      #4bc0c8,
+      #c779d0,
+      #feac5e);
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+// 布局-顶部导航栏样式
+.layout-Header {
+  // 背景色
+  background-color: $layoutHeaderBackgroundColor;
+  // 透明度
+  opacity: 1;
+}
+
+// 布局-中间区域padding为0
+.el-main {
+  padding: 0px
+}
+
+.el-row {
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}

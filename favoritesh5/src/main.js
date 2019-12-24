@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import Vuex from 'vuex'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -12,11 +11,11 @@ import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
+import '@/styles/index.scss' // global css
 
 Vue.use(VueQuillEditor)
 Vue.use(vueResource)
 Vue.use(mavonEditor)
-Vue.use(Vuex)
 new Vue({
   router,
   store,

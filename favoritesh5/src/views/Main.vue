@@ -68,21 +68,27 @@ export default {
   },
   watch: {
     // 如果 `clientHeight` 发生改变，这个函数就会运行
-    clientHeight: function () {
-      this.changeFixed(this.clientHeight)
+    clientHeight: function (newVlaue, oldValue) {
+      console.info('watch:' + newVlaue)
+      this.changeFixed(newVlaue)
     }
   },
   mounted () {
     // 获取浏览器可视区域高度
-    this.clientHeight = `${document.documentElement.clientHeight}`
+    this.clientHeight = document.documentElement.clientHeight
+    const _ = this
     window.onresize = function temp () {
-      this.clientHeight = `${document.documentElement.clientHeight}`
+      _.clientHeight = `${document.documentElement.clientHeight}`
+      console.info('window.onresize:' + this.clientHeight)
     }
   },
 
   methods: {
      // 动态修改样式
     changeFixed (clientHeight) {
+      console.info('clientHeight' + clientHeight)
+      this.$store.state.clientHeight = clientHeight + 'px'
+      console.info('this.$store.state.heightClient:' + this.$store.state.heightClient)
       this.$refs.homePage.$el.style.height = clientHeight - 60 + 'px'
     },
     route (path) {

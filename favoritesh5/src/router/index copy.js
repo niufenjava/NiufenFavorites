@@ -1,40 +1,41 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import WebSite from '../views/WebSite.vue'
 import Todo from '../views/Todo.vue'
-import Layout from '@/layout'
+import Main from '../views/Main.vue'
 Vue.use(VueRouter)
 
 const routes = [{
     path: '/',
-    component: Layout,
-    redirect: '/home',
+    component: Main,
+    redirect: '/webSite',
     children: [{
-      path: '/home',
-      component: Home,
-      name: 'Home'
-    }]
-  },
-  {
-    path: '/',
-    component: Layout,
-    children: [{
-      path: '/message',
-      component: () => import('@/views/Message.vue'),
-      name: 'Message'
-    }]
-  }, {
-    path: '/',
-    component: Layout,
-    children: [{
-      path: '/WebSite',
-      component: () => import('@/views/WebSite.vue'),
+      path: 'webSite',
+      component: WebSite,
       name: 'WebSite'
     }]
   },
   {
     path: '/',
-    component: Layout,
+    component: Main,
+    children: [{
+      path: '/message',
+      component: () => import('@/views/Message.vue'),
+      name: 'Message'
+    }]
+  },
+  {
+    path: '/',
+    component: Main,
+    children: [{
+      path: '/home',
+      component: () => import('@/views/Home.vue'),
+      name: 'Home'
+    }]
+  },
+  {
+    path: '/',
+    component: Main,
     children: [{
       path: '/todo',
       component: Todo,
@@ -43,16 +44,16 @@ const routes = [{
   },
   {
     path: '/',
-    component: Layout,
+    component: Main,
     children: [{
-      path: '/dict',
-      component: () => import('@/views/Dict'),
-      name: 'dict'
+      path: '/word',
+      component: () => import('@/views/Word.vue'),
+      name: 'Word'
     }]
   },
   {
     path: '/',
-    component: Layout,
+    component: Main,
     children: [{
       path: '/notebook',
       component: () => import('@/views/Notebook.vue'),

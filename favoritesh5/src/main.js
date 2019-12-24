@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import Vuex from 'vuex'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -15,6 +16,7 @@ import 'mavon-editor/dist/css/index.css'
 Vue.use(VueQuillEditor)
 Vue.use(vueResource)
 Vue.use(mavonEditor)
+Vue.use(Vuex)
 new Vue({
   router,
   store,

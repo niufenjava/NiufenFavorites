@@ -1,6 +1,9 @@
 package io.renren.notebook.service.impl;
 
+import io.renren.dict.entity.DictWordDefEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,6 +27,16 @@ public class NoteServiceImpl extends ServiceImpl<NoteDao, NoteEntity> implements
         );
 
         return new PageUtils(page);
+    }
+
+
+
+    @Override
+    public List<NoteEntity> listByParentId(Long parentId) {
+        return this.list(
+                new QueryWrapper<NoteEntity>()
+                        .eq("parent_id",parentId)
+        );
     }
 
 }

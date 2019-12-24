@@ -16,5 +16,7 @@ import java.util.Map;
 public interface NoteContentService extends IService<NoteContentEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    NoteContentEntity getByNoteId(Long noteId);
 }
 

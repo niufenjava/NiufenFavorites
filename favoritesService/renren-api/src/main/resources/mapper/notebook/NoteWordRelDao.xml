@@ -8,8 +8,6 @@
         <result property="id" column="id"/>
         <result property="noteId" column="note_id"/>
         <result property="wordId" column="word_id"/>
-        <result property="type" column="type"/>
-        <result property="descp" column="descp"/>
         <result property="createTime" column="create_time"/>
         <result property="modifyTime" column="modify_time"/>
     </resultMap>

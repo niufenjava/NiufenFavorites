@@ -31,15 +31,7 @@ public class NoteWordRelEntity implements Serializable {
 	/**
 	 * 笔记内容
 	 */
-	private String wordId;
-	/**
-	 * 笔记内容类型
-	 */
-	private Integer type;
-	/**
-	 * 描述/备注
-	 */
-	private String descp;
+	private Long wordId;
 	/**
 	 * 创建时间
 	 */

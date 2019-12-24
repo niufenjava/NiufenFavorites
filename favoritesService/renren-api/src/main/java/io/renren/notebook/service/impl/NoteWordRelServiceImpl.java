@@ -26,4 +26,11 @@ public class NoteWordRelServiceImpl extends ServiceImpl<NoteWordRelDao, NoteWord
         return new PageUtils(page);
     }
 
+    @Override
+    public NoteWordRelEntity getByNoteAndWordId(Long noteId,Long wordId){
+        return this.getOne(new QueryWrapper<NoteWordRelEntity>()
+            .eq("note_id",noteId)
+                .eq("word_id",wordId)
+        );
+    }
 }

@@ -8,6 +8,12 @@
         <result property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="soundmark" column="soundmark"/>
+        <result property="plural" column="plural"/>
+        <result property="thirdSingular" column="third_singular"/>
+        <result property="presentParticiple" column="present_participle"/>
+        <result property="pastParticiple" column="past_participle"/>
+        <result property="pastTense" column="past_tense"/>
+        <result property="other" column="other"/>
         <result property="degree" column="degree"/>
         <result property="skillDesc" column="skill_desc"/>
         <result property="descp" column="descp"/>

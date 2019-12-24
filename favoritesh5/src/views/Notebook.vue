@@ -20,28 +20,34 @@
             type="primary"
             @click="append"
           >新增</el-button>
-          <el-button type="primary">删除</el-button>
-          <el-button type="primary">改名</el-button>
+          <el-button
+            type="primary"
+            @click="deleteNode"
+          >删除</el-button>
         </el-row>
         <el-scrollbar style="height:100%">
 
           <div ref="listRef">
-            <!-- 这里应该是个树 -->
+            <!-- 这里应该是个树
+                 default-expand-all 是否默认展开所有节点
+
+             -->
             <div style="heght:100%;margin-top:20px;">
               <el-tree
                 ref="tree"
                 class="filter-tree"
-                :data="data"
+                :data="treeData"
                 :props="defaultProps"
                 :filter-node-method="filterNode"
                 node-key="id"
-                default-expand-all
                 check-on-click-node
+                auto-expand-parent
                 highlight-current
                 :expand-on-click-node="false"
                 draggable
                 :allow-drop="allowDrop"
                 :allow-drag="allowDrag"
+                @node-click="handleNodeClick"
                 @node-drag-start="handleDragStart"
                 @node-drag-enter="handleDragEnter"
                 @node-drag-leave="handleDragLeave"
@@ -74,6 +80,12 @@
           <!-- 我的词典详情显示区域 -->
           <el-col :span="myWordCol">
             <el-row>
+              <el-switch
+                v-model="noteSwitch"
+                style="margin-bottom:5px;"
+                active-text="编辑"
+                inactive-text="阅读"
+              />
               <el-rate
                 v-model="word.degree"
                 style="display:inline;margin-left:20px;float:right"
@@ -85,35 +97,41 @@
             </el-row>
             <!-- 第一行，主要显示区域 -->
             <el-row>
-              <span style="color:#409eff;font-size:30px;font-weight:800">{{ note.title }}</span>
+              <el-input
+                v-model="note.title"
+                placeholder="标题"
+                @blur="titleChange"
+              />
 
-              <!-- 编辑按钮 -->
-              <el-link
-                style="margin-right:10px;margin-top:20px;float:right"
-                type="default"
-                icon="el-icon-edit"
-                @click="editWordClick"
-              >编辑</el-link>
-            </el-row>
-
-            <!-- 我是一个分割线 -->
-            <!-- 折叠面板。循环，单词详细解释 -->
-            <el-row style="margin-top:10px;">
-              <div
-                ref="wordDetailMain"
-                style="width:100%;height:100%"
-              >
-                <mavon-editor
-                  v-model="content1"
-                  style="height:100%;"
-                  fontSize="24px"
-                  placeholder="1231231"
-                  codeStyle="vs"
-                  previewBackground="transparent"
-                  toolbarsBackground="transparent"
-                  :navigation="true"
-                />
-              </div>
+              <!-- 我是一个分割线 -->
+              <!-- 折叠面板。循环，单词详细解释 -->
+              <el-row style="margin-top:10px;">
+                <div
+                  ref="wordDetailMain"
+                  style="width:100%;height:100%"
+                >
+                  <mavon-editor
+                    v-show="noteSwitch"
+                    v-model="note.content"
+                    style="height:100%;"
+                    fontSize="24px"
+                    placeholder=""
+                    codeStyle="vs"
+                    previewBackground="transparent"
+                    toolbarsBackground="transparent"
+                    :navigation="false"
+                    @change="contentChange"
+                    @save="contentChange"
+                  />
+                  <MDView
+                    v-show="!noteSwitch"
+                    ref="mdview"
+                    @callback="mdViewSelectWord"
+                  >
+                    {{ note.content }}
+                  </MDView>
+                </div>
+              </el-row>
             </el-row>
           </el-col>
 
@@ -123,14 +141,54 @@
             ref="thirdDictHeight"
             :span="thirdWordCol"
           >
-
+            <!-- 新增单词按钮 -->
+            <el-row>
+              <el-col :span="12">
+                <el-button
+                  size="small"
+                  style="margin:10px"
+                  type="primary"
+                  @click="addWordClick"
+                >关联单词</el-button>
+              </el-col>
+              <el-col :span="12">
+                <el-dropdown
+                  size="small"
+                  style="float:right;margin-top:15px;"
+                >
+                  <span class="el-dropdown-link">
+                    默认排序<i class="el-icon-arrow-down el-icon--right" />
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item>默认排序</el-dropdown-item>
+                    <el-dropdown-item>熟悉程度</el-dropdown-item>
+                    <el-dropdown-item>查询次数</el-dropdown-item>
+                    <el-dropdown-item>修改时间</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-input
+                v-model="searchInput"
+                style="margin:10px;width:200px;margin-top:0px;"
+                placeholder="Search"
+                autocomplete="on"
+                clearable
+                @input="search"
+              />
+            </el-row>
             <el-container style="width:100%;height:100%;">
               <el-scrollbar style="width:100%;height:100%;">
 
-                <div style="width:100%;height:100%">
+                <div
+                  ref="wordListRef"
+                  style="width:100%;height:100%"
+                >
                   <el-card
-                    v-for="item in wordList"
+                    v-for="(item, index) in wordList"
                     :key="item.id"
+                    :index="index"
                     style="width:95%;margin-bottom:5px;"
                     shadow="hover"
                   >
@@ -138,7 +196,24 @@
                       slot="header"
                       class="clearfix"
                     >
-                      <span>{{ item.name }}</span>
+                      <span
+                        v-if="item.type === 'danger'"
+                        style="color:#F56C6C"
+                        @click="wordClick(item.name)"
+                      >{{ item.name }}</span>
+                      <span
+                        v-if="item.type !== 'danger'"
+                        style="color:#409EFF"
+                        @click="wordClick(item.name)"
+                      >{{ item.name }}</span>
+                      <el-link
+                        style="float: right; padding: 3px 0"
+                        :underline="false"
+                        @click="cancelRelWord(item.id)"
+                      >
+                        <i class="el-icon-close el-icon--right" />
+                      </el-link>
+
                     </div>
                     {{ item.descp }}
                   </el-card>
@@ -161,23 +236,17 @@
 </template>
 <script>
 import editWord from '@/views/EditWord.vue'
+import MDView from '@/components/MDView'
 import { dictApi } from '@/api/dict'
 import { notebookApi } from '@/api/notebook'
 
-const content = `
-**This is test**
-
-* vue
-* element
-* webpack
-
-`
 export default {
   components: {
-    editWord
+    editWord, MDView
   },
   data () {
     return {
+      noteSwitch: true,
       markDownProps: {
         value: 'test',
         language: 'en',
@@ -186,52 +255,19 @@ export default {
       wordList: [
       ],
       note: {
-title: '我是一个标题'
+        title: '',
+        content: ''
       },
-      content1: null,
-      content2: content,
-      content3: content,
-      content4: content,
       html: '',
       languageTypeList: {
         'en': 'en_US',
         'zh': 'zh_CN',
         'es': 'es_ES'
       },
-      data: [{
+      treeData: [{
         id: 1,
-        label: '一级 1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-        children: [{
-          id: 4,
-          label: '二级 1-1',
-          children: [{
-            id: 9,
-            label: '三级 1-1-1'
-          }, {
-            id: 10,
-            label: '三级 1-1-2'
-          }]
-        }]
-      }, {
-        id: 2,
-        label: '一级 2',
-        children: [{
-          id: 5,
-          label: '二级 2-1'
-        }, {
-          id: 6,
-          label: '二级 2-2'
-        }]
-      }, {
-        id: 3,
-        label: '一级 3',
-        children: [{
-          id: 7,
-          label: '二级 3-1'
-        }, {
-          id: 8,
-          label: '二级 3-2'
-        }]
+        label: '笔记本',
+        children: [{}]
       }],
         defaultProps: {
           children: 'children',
@@ -243,7 +279,7 @@ title: '我是一个标题'
       thirdWordCol: 6,
       searchInput: null,
       collapseActiveIds: [0, 1, 2, 3, 4],
-      value: null,
+      value: '',
       iconClasses: ['icon-rate-face-1', 'icon-rate-face-2', 'icon-rate-face-3'], // 等同于 { 2: 'icon-rate-face-1', 4: { value: 'icon-rate-face-2', excluded: true }, 5: 'icon-rate-face-3' }
       rateColors: ['#99A9BF', '#F7BA2A', '#FF9900'], // 等同于 { 2: '#99A9BF', 4: { value: '#F7BA2A', excluded: true }, 5: '#FF9900' }
       rateTexts: ['未知', '失望', '一般', '良好', '掌握'],
@@ -274,12 +310,16 @@ title: '我是一个标题'
     },
     word: function () {
       // this.$refs.thirdDictRef.open(this.word.name)
+    },
+    noteSwitch: function () {
+      if (this.noteSwitch) {
+        this.$refs.mdview.open(this.note.content)
+      }
     }
   },
   created() {
     this.wordListInit()
     this.getTree()
-  
   },
   mounted () {
     // 获取浏览器可视区域高度
@@ -292,19 +332,44 @@ title: '我是一个标题'
   },
 
   methods: {
+    noteSwitchChange() {
+      if (this.noteSwitch) {
+        this.$refs.mdview.open(this.note.content)
+      }
+    },
+    handleNodeClick() {
+      this.getNoteDetail()
+    },
+    titleChange() {
+      const _ = this
+      notebookApi.noteRename({ 'id': this.note.id, 'title': this.note.title }).then(response => {
+        const node = _.getCurrentNode()
+        console.info(node)
+        node.label = this.note.title
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    contentChange() {
+      notebookApi.noteContent({ 'id': this.note.id, 'content': this.note.content }).then(response => {
+      }).catch(err => {
+        console.log(err)
+      })
+    },
     wordListInit() {
-      dictApi.wordList().then(response => {
+      notebookApi.noteRelWordList(this.note.id).then(response => {
         this.wordList = response.wordList
       }).catch(err => {
         console.log(err)
       })
     },
     getTree() {
-      this.$refs.tree.setCheckedKeys([]);
+      // this.$refs.tree.setCheckedKeys([]);
+      const _ = this
       notebookApi.noteTree().then(response => {
-        console.info("response.tree",response)
-        this.data = response.tree
-        this.setCheckedKeys()
+        console.info('response.tree', response)
+        _.treeData = response.tree
+        // _.setCheckedKeys()
       }).catch(err => {
         console.log(err)
       })
@@ -345,23 +410,60 @@ title: '我是一个标题'
         if (!value) return true
         return data.label.indexOf(value) !== -1
       },
-      setCheckedKeys(key) {
-        this.$refs.tree.setCheckedKeys([key]);
+      setCheckedKeys() {
+        // this.$refs.tree.setCheckedKeys([this.curTreeKey]);
       },
     // 树-添加子节点
-    append() {
+    deleteNode() {
       const node = this.getCurrentNode()
-      if(node === undefined || node === null || node.length === 0){
+      if (node === undefined || node === null || node.length === 0) {
         this.$notify.error({
           title: '错误',
           message: '请选择一个节点再添加'
-        });
+        })
         return
       }
-      notebookApi.noteCreate({'name':'未命名','patientId':node.id}).then(response =>{
+        this.$confirm('此操作将永久删除该笔记, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          notebookApi.noteDelete({ 'id': node.id }).then(response => {
+            console.info(response)
+            this.$refs.tree.remove(node)
+            this.getNoteDetail()
+              this.$notify.success({
+                title: '成功',
+                message: '删除笔记成功'
+              })
+            // this.getTree()
+          }).catch(err => {
+            console.log(err)
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+    },
+    append() {
+      const node = this.getCurrentNode()
+      if (node === undefined || node === null || node.length === 0) {
+        this.$notify.error({
+          title: '错误',
+          message: '请选择一个节点再添加'
+        })
+        return
+      }
+      notebookApi.noteCreate({ 'name': '未命名', 'patientId': node.id }).then(response => {
         console.info(response)
         this.curTreeKey = response.id
-        this.getTree()
+        this.$refs.tree.append({ 'label': '未命名', 'id': this.curTreeKey }, node)
+        this.$refs.tree.setCurrentKey(this.curTreeKey)
+        this.$refs.tree.store.nodesMap[node.id].expanded = true
+        this.getNoteDetail()
+        // this.getTree()
       }).catch(err => {
         console.log(err)
       })
@@ -374,7 +476,7 @@ title: '我是一个标题'
       },
 
       getCurrentNode() {
-        console.info(this.$refs.tree.getCurrentNode());
+        console.info(this.$refs.tree.getCurrentNode())
         return this.$refs.tree.getCurrentNode()
       },
 
@@ -402,9 +504,21 @@ title: '我是一个标题'
         console.log(err)
       })
     },
-    init() {
-      this.wordListInit()
-      this.wordInfo(this.word.name)
+    mdViewSelectWord(txt) {
+      this.searchInput = txt
+      this.search()
+    },
+    init(wordId) {
+      console.info(wordId)
+      notebookApi.noteRelWord({ 'id': this.note.id, 'wordId': wordId })
+        .then(response => {
+          this.wordListInit()
+        })
+        .catch(err => {
+          console.log(err)
+        })
+      // this.wordListInit()
+      // this.wordInfo(this.word.name)
     },
     wordInfo(word) {
       dictApi.wordInfo(word).then(response => {
@@ -421,12 +535,11 @@ title: '我是一个标题'
         console.log(err)
       })
     },
-    wordListInit() {
-      dictApi.wordList().then(response => {
-        this.wordList = response.wordList
-        this.word = this.wordList[0]
-      }).catch(err => {
-        console.log(err)
+    getNoteDetail() {
+      const curNode = this.getCurrentNode()
+      notebookApi.noteDetail(curNode.id).then(response => {
+        this.note = response.note
+        this.wordListInit()
       })
     },
     clickWord(word) {
@@ -439,10 +552,11 @@ title: '我是一个标题'
       }
       this.wordInfo(word)
     },
-    editWordClick () {
-      this.$refs.editWordComp.open(null, this.word.name)
+    wordClick (word) {
+      this.$refs.editWordComp.open(null, word)
     },
     addWordClick () {
+      console.info('this.searchInput', this.searchInput)
       this.$refs.editWordComp.open(null, this.searchInput)
     },
     search () {
@@ -463,8 +577,8 @@ title: '我是一个标题'
           }
         }
       }
-      for (let j = 0; j < this.$refs.listRef.children.length; j++) {
-        const element = this.$refs.listRef.children[j]
+      for (let j = 0; j < this.$refs.wordListRef.children.length; j++) {
+        const element = this.$refs.wordListRef.children[j]
         const attriIndex = element.getAttribute('index')
         if (attriIndex + '' === scrollIndex + '') {
           element.scrollIntoView()
@@ -483,13 +597,33 @@ title: '我是一个标题'
       // this.$refs.wordAside.$el.style.height = clientHeight - 165 + 'px'
       this.$refs.listRef.style.height = clientHeight - 190 + 'px'
       // this.$refs.wordMain.$el.style.height = clientHeight - 160 + 'px'
-      this.$refs.thirdDictHeight.$el.style.height = clientHeight - 125 + 'px'
+      this.$refs.thirdDictHeight.$el.style.height = clientHeight - 165 + 'px'
       this.$refs.wordDetailMain.style.height = clientHeight - 240 + 'px'
+    },
+    cancelRelWord (wordId) {
+      notebookApi.noteRelWordDelete({ 'id': this.note.id, 'wordId': wordId })
+        .then(response => {
+          this.wordListInit()
+        })
+        .catch(err => {
+          console.error(err)
+        })
     }
   }
 }
 </script>
 <style>
+.markdown-body {
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  line-height: 1.5;
+  color: #24292e;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 30px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
 .el-tree-node__expand-icon {
   cursor: pointer;
   color: blueviolet;

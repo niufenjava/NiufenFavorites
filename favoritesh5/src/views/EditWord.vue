@@ -34,6 +34,7 @@
                   <md-input
                     v-model="word.soundmark"
                     placeholder="音标"
+                    @blur="saveWord"
                   >Soundmark</md-input>
                 </el-col>
                 <el-col
@@ -49,7 +50,53 @@
 
                 </el-col>
               </el-row>
+              <el-row style="margin-bottom:20px">
+                <el-col :span="8">
+                  <md-input
+                    v-model="word.plural"
+                    placeholder="复数"
+                    @blur="saveWord"
+                  >复数</md-input>
+                </el-col>
+                <el-col :span="8">
+                  <md-input
+                    v-model="word.thirdSingular"
+                    placeholder="第三人称单数"
+                    @blur="saveWord"
+                  >第三人称单数</md-input>
+                </el-col>
+                <el-col :span="8">
+                  <md-input
+                    v-model="word.presentParticiple"
+                    placeholder="现在分词"
+                    @blur="saveWord"
+                  >现在分词</md-input>
+                </el-col>
+              </el-row>
 
+              <el-row style="margin-bottom:20px">
+                <el-col :span="8">
+                  <md-input
+                    v-model="word.pastParticiple"
+                    placeholder="过去分词"
+                    @blur="saveWord"
+                  >过去分词</md-input>
+                </el-col>
+                <el-col :span="8">
+                  <md-input
+                    v-model="word.pastTense"
+                    placeholder="过去式"
+                    @blur="saveWord"
+                  >过去式</md-input>
+                </el-col>
+                <el-col :span="8">
+                  <md-input
+                    v-model="word.other"
+                    placeholder="其他"
+                    @blur="saveWord"
+                  >其他</md-input>
+                </el-col>
+              </el-row>
               <!-- 我是一个分割线 -->
               <!-- 折叠面板。循环，单词详细解释 -->
               <el-scrollbar>
@@ -75,7 +122,7 @@
                         class="clearfix"
                       >
                         <div style="display:inline;width:80px">
-                          <span> {{ def.name }}</span>
+                          <span> 解释{{ index+1 }}</span>
                           <el-link
                             style="float: right; padding: 3px 0;display:inline;"
                             type="danger"
@@ -86,7 +133,10 @@
 
                       </div>
                       <el-row style="margin-bottom:10px;">
-                        <el-radio-group v-model="def.type">
+                        <el-radio-group
+                          v-model="def.type"
+                          @change="saveWord"
+                        >
                           <el-radio :label="1">n.</el-radio>
                           <el-radio :label="2">v.</el-radio>
                           <el-radio :label="3">adj.</el-radio>
@@ -101,6 +151,7 @@
                         <md-input
                           v-model="def.name"
                           placeholder="definition"
+                          @blur="saveWord"
                         >释义</md-input>
                       </el-row>
                       <div>
@@ -109,6 +160,7 @@
                             v-model="def.explainEn"
                             style="margin-top:50px;"
                             placeholder="explainEn"
+                            @blur="saveWord"
                           >英文解释</md-input>
                         </div>
                         <div>
@@ -116,6 +168,7 @@
                             v-model="def.explainCh"
                             style="margin-top:50px;"
                             placeholder="explainCh"
+                            @blur="saveWord"
                           >中文解释</md-input>
                         </div>
                       </div>
@@ -130,6 +183,7 @@
                             v-model="example.exampleEn"
                             style="margin-top:10px;"
                             placeholder="exampleEn"
+                            @blur="saveWord"
                           />
                           <el-row>
                             <el-col :span="20">
@@ -137,6 +191,7 @@
                                 v-model="example.exampleCh"
                                 style="margin-top:10px;"
                                 placeholder="exampleCh"
+                                @blur="saveWord"
                               />
                             </el-col>
                             <el-col
@@ -207,6 +262,7 @@
                       v-model="word.skillDesc"
                       style="margin-bottom:50px;margin-top:50px"
                       placeholder="记忆技巧"
+                      @blur="saveWord"
                     >记忆技巧</md-input>
 
                   </div>
@@ -243,27 +299,11 @@ export default {
   },
   data () {
     return {
+      noteId: null,
       options: [],
       selectValue: [],
       list: [],
       loading: false,
-      states: ['Alabama', 'Alaska', 'Arizona',
-        'Arkansas', 'California', 'Colorado',
-        'Connecticut', 'Delaware', 'Florida',
-        'Georgia', 'Hawaii', 'Idaho', 'Illinois',
-        'Indiana', 'Iowa', 'Kansas', 'Kentucky',
-        'Louisiana', 'Maine', 'Maryland',
-        'Massachusetts', 'Michigan', 'Minnesota',
-        'Mississippi', 'Missouri', 'Montana',
-        'Nebraska', 'Nevada', 'New Hampshire',
-        'New Jersey', 'New Mexico', 'New York',
-        'North Carolina', 'North Dakota', 'Ohio',
-        'Oklahoma', 'Oregon', 'Pennsylvania',
-        'Rhode Island', 'South Carolina',
-        'South Dakota', 'Tennessee', 'Texas',
-        'Utah', 'Vermont', 'Virginia',
-        'Washington', 'West Virginia', 'Wisconsin',
-        'Wyoming'],
       mainHeight: 0,
       direction: 'rtl',
       drawer: false,
@@ -297,21 +337,19 @@ export default {
     this.clientHeight = `${document.documentElement.clientHeight}`
     this.changeFixed(this.clientHeight)
   },
-  mounted () {
-    this.list = this.states.map(item => {
-      return { value: `value:${item}`, label: `label:${item}` }
-    })
-  },
 
   methods: {
     wordChange() {
       this.wordName = this.word.name
+      this.wordInfo()
     },
     wordInfo() {
       dictApi.wordInfo(this.word.name).then(response => {
         console.info(response)
+        if (response.word.name) {
         this.word = response.word
         this.wordName = this.word.name
+        }
       }).catch(err => {
         console.log(err)
       })
@@ -326,7 +364,7 @@ export default {
       this.word.defList.splice(index, 1)
     },
     addExample (list, def) {
-      if (list === undefined) {
+      if (list === undefined || list === null) {
         list = []
         def.exampleList = []
       }
@@ -358,14 +396,19 @@ export default {
       // }).catch(err => {
       //   console.log(err)
       // })
-      this.$emit('parentCallback')
+      this.$emit('parentCallback', this.word.id)
       done()
       // this.drawer = false
     },
     // 打开抽屉方法
-    open (id, word) {
+    open (id, word, noteId) {
+      console.info(word)
+      this.word = {}
       if (id === null) {
         this.word.name = word
+      }
+      if (noteId) {
+        this.noteId = noteId
       }
       this.wordInfo()
       this.drawer = true
@@ -380,7 +423,7 @@ export default {
       console.info('this.word', this.word)
       dictApi.wordCreateOrUpdate(this.word).then(response => {
         console.info(response)
-        this.wordInfo()
+        // this.wordInfo()
       }).catch(err => {
         console.log(err)
       })

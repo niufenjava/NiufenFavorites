@@ -33,6 +33,30 @@ public class DictWordEntity implements Serializable {
 	 */
 	private String soundmark;
 	/**
+	 * 复数
+	 */
+	private String plural;
+	/**
+	 * 第三人称单数
+	 */
+	private String thirdSingular;
+	/**
+	 * 现在分词
+	 */
+	private String presentParticiple;
+	/**
+	 * 过去分词
+	 */
+	private String pastParticiple;
+	/**
+	 * 过去式
+	 */
+	private String pastTense;
+	/**
+	 * 其他
+	 */
+	private String other;
+	/**
 	 * 熟悉程度，详见枚举
 	 */
 	private Integer degree;

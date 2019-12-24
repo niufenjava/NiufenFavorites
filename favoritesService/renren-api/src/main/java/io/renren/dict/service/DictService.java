@@ -48,6 +48,24 @@ public class DictService {
         wordService.saveOrUpdate(wordEntity);
     }
 
+    public List<WordSimpleBO> listWordByIds(List<Long> ids){
+        List<WordSimpleBO> wordNameList = ListUtils.newLinkedList();
+        List<DictWordEntity> entityList = wordService.list(new QueryWrapper<DictWordEntity>()
+                .in("id",ids)
+                .orderByAsc("name")
+        );
+        if(!CollectionUtils.isEmpty(entityList)){
+            for (DictWordEntity wordEntity : entityList) {
+                WordSimpleBO simpleBO = new WordSimpleBO();
+                simpleBO.setId(wordEntity.getId());
+                simpleBO.setName(wordEntity.getName());
+                simpleBO.setDescp(wordEntity.getDescp());
+                wordNameList.add(simpleBO);
+            }
+        }
+        return wordNameList;
+    }
+
     public List<WordSimpleBO> listWordName(){
         List<WordSimpleBO> wordNameList = ListUtils.newLinkedList();
         List<DictWordEntity> entityList = wordService.list(new QueryWrapper<DictWordEntity>()
@@ -58,7 +76,7 @@ public class DictService {
                 WordSimpleBO simpleBO = new WordSimpleBO();
                 simpleBO.setId(wordEntity.getId());
                 simpleBO.setName(wordEntity.getName());
-                simpleBO.setDescp("n. 抽象；");
+                simpleBO.setDescp(wordEntity.getDescp());
                 wordNameList.add(simpleBO);
             }
         }
@@ -68,6 +86,7 @@ public class DictService {
     @Transactional
     public WordForm getWordForm(String word) {
         WordForm wordForm = new WordForm();
+
         List<Long> eytmaIds = ListUtils.newLongList();
         DictWordEntity wordEntity = wordService.getByName(word);
         if (ObjectTools.isNotNull(wordEntity)) {
@@ -75,6 +94,13 @@ public class DictService {
             wordForm.setName(wordEntity.getName());
             wordForm.setSoundmark(wordEntity.getSoundmark());
             wordForm.setDegree(wordEntity.getDegree());
+
+            wordForm.setPlural(wordEntity.getPlural());
+            wordForm.setThirdSingular(wordEntity.getThirdSingular());
+            wordForm.setPresentParticiple(wordEntity.getPresentParticiple());
+            wordForm.setPastParticiple(wordEntity.getPastParticiple());
+            wordForm.setPastTense(wordEntity.getPastTense());
+            wordForm.setOther(wordEntity.getOther());
             wordForm.setSkillDesc(wordEntity.getSkillDesc());
 
             List<DictWordDefEntity> defEntityList = wordDefService.listByWordId(wordEntity.getId());
@@ -137,9 +163,22 @@ public class DictService {
         createOrUpdateWordEntity.setId(wordForm.getId());
         createOrUpdateWordEntity.setName(wordForm.getName());
         createOrUpdateWordEntity.setSoundmark(wordForm.getSoundmark());
+        createOrUpdateWordEntity.setPlural(wordForm.getPlural());
+        createOrUpdateWordEntity.setThirdSingular(wordForm.getThirdSingular());
+        createOrUpdateWordEntity.setPresentParticiple(wordForm.getPresentParticiple());
+        createOrUpdateWordEntity.setPastParticiple(wordForm.getPastParticiple());
+        createOrUpdateWordEntity.setPastTense(wordForm.getPastTense());
+        createOrUpdateWordEntity.setOther(wordForm.getOther());
         createOrUpdateWordEntity.setDegree(wordForm.getDegree());
         createOrUpdateWordEntity.setSkillDesc(wordForm.getSkillDesc());
-        createOrUpdateWordEntity.setDescp(wordForm.getDescp());
+        String descp = "";
+        if(!CollectionUtils.isEmpty(wordForm.getDefList())){
+            for (WordDefForm defForm : wordForm.getDefList()) {
+                descp = descp+"；"+WordDefTypeEnum.getNameByIndex(defForm.getType())+defForm.getName();
+            }
+            descp = descp.replaceFirst("；","");
+        }
+        createOrUpdateWordEntity.setDescp(descp);
         createOrUpdateWordEntity.setQueryCount(0);
         wordService.saveOrUpdate(createOrUpdateWordEntity);
         this.batchSaveWordDef(wordForm.getDefList(), createOrUpdateWordEntity);
@@ -166,6 +205,9 @@ public class DictService {
             return;
         }
         for (WordDefForm defForm : wordDefFormList) {
+            if(ObjectTools.isNull(defForm.getName())){
+                defForm.setName("");
+            }
             DictWordDefEntity defEntity = new DictWordDefEntity();
             defEntity.setWordId(wordEntity.getId());
             defEntity.setName(defForm.getName());

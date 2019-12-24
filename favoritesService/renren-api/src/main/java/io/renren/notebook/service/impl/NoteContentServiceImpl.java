@@ -1,5 +1,6 @@
 package io.renren.notebook.service.impl;
 
+import io.renren.dict.entity.DictWordEntity;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -26,4 +27,12 @@ public class NoteContentServiceImpl extends ServiceImpl<NoteContentDao, NoteCont
         return new PageUtils(page);
     }
 
+
+    @Override
+    public NoteContentEntity getByNoteId(Long noteId){
+        return this.getOne(
+                new QueryWrapper<NoteContentEntity>()
+                        .eq("note_id",noteId)
+        );
+    }
 }

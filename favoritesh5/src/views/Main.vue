@@ -45,8 +45,10 @@
       ref="homePage"
       style="padding: 0px"
     >
-      <!-- 路由显示区 -->
-      <router-view style="height:100%;" />
+      <keep-alive>
+        <!-- 路由显示区 -->
+        <router-view style="height:100%;" />
+      </keep-alive>
     </el-main>
   </el-container>
 </template>

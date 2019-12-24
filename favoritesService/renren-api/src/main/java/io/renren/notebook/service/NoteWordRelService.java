@@ -16,5 +16,7 @@ import java.util.Map;
 public interface NoteWordRelService extends IService<NoteWordRelEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    NoteWordRelEntity getByNoteAndWordId(Long noteId, Long wordId);
 }
 

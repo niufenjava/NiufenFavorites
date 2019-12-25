@@ -1,27 +1,31 @@
 <template>
-  <div style="height:100%">
+  <div>
     <el-tabs>
       <el-tab-pane label="百度翻译">
         <iframe
-          ref="baiduDict"
           :src="baiduDictSrc"
-          style="width:100%;height:600px"
+          :style="getDictMainStyle()"
         />
       </el-tab-pane>
       <el-tab-pane label="词源">
         <iframe
-          ref="etymonline"
           :src="etymonlineSrc"
-          style="width:100%;height:600px"
+          :style="getDictMainStyle()"
         />
       </el-tab-pane>
-      <el-tab-pane label="维基百科">
+      <el-tab-pane label="剑桥词典">
         <iframe
-          ref="wiki"
-          :src="etymonwikipedia"
-          style="width:100%;height:600px"
+          :src="cambridgeSrc"
+          :style="getDictMainStyle()"
         />
       </el-tab-pane>
+      <!-- <el-tab-pane label="柯林斯">
+        <iframe
+          ref="collins"
+          :src="collinsSrc"
+          style="width:100%;height:600px"
+        />
+      </el-tab-pane> -->
     </el-tabs>
 
   </div>
@@ -32,46 +36,36 @@ export default {
     return {
       word: 'test',
       flush: true,
-            clientHeight: '',
+            dictTopHeight: 85,
 
       baiduDictBaseSrc: 'https://fanyi.baidu.com/?aldtype=16047#en/zh/',
+      baiduDictSrc: '',
       etymonlineBaseSrc: 'https://www.etymonline.com/search?q=',
-      baiduDictSrc: 'https://fanyi.baidu.com/?aldtype=16047#en/zh/',
-      etymonlineSrc: 'https://www.etymonline.com/search?q=',
-      etymonwikipedia: 'https://zh.wikipedia.org/wiki/Wikipedia:%E9%A6%96%E9%A1%B5'
+      etymonlineSrc: '',
+      cambridgeBaseSrc: 'https://dictionary.cambridge.org/zhs/%E8%AF%8D%E5%85%B8/%E8%8B%B1%E8%AF%AD-%E6%B1%89%E8%AF%AD-%E7%AE%80%E4%BD%93/',
+      cambridgeSrc: '',
+      collinsBaseSrc: 'https://www.collinsdictionary.com/zh/dictionary/english/',
+      collinsSrc: ''
+
     }
   },
-  watch: {
-    // 如果 `clientHeight` 发生改变，这个函数就会运行
-    clientHeight: function () {
-      this.changeFixed(this.clientHeight)
-    }
-  },
-  mounted () {
-    // 获取浏览器可视区域高度
-    this.clientHeight = `${document.documentElement.clientHeight}`
-    window.onresize = function temp () {
-      this.clientHeight = `${document.documentElement.clientHeight}`
+  computed: {
+    mainBodyHeight() {
+      return this.$store.state.mainBodyHeight
     }
   },
   methods: {
-     // 动态修改样式
-    changeFixed (clientHeight) {
-      this.$refs.baiduDict.style.height = clientHeight - 160 + 'px'
-            this.$refs.etymonline.style.height = clientHeight - 160 + 'px'
-            this.$refs.wiki.style.height = clientHeight - 160 + 'px'
+   getDictMainStyle() {
+      return 'width:100%;height:' + (this.mainBodyHeight - this.dictTopHeight) + 'px'
     },
   // 打开抽屉方法
     open (wordName) {
       console.info(wordName)
       this.word = wordName
       console.info(this.baiduDictSrc)
-      this.baiduDictSrc = this.baiduDictBaseSrc + wordName
-      this.etymonlineSrc = this.etymonlineBaseSrc + wordName
-
-      // this.$refs.baiduDict.contentWindow.location.reload(true)
-      // this.$refs.etymonline.contentWindow.location.reload(true)
-      // this.$refs.wiki.contentWindow.location.reload(true)
+      this.baiduDictSrc = this.baiduDictBaseSrc + this.word
+      this.etymonlineSrc = this.etymonlineBaseSrc + this.word
+      this.cambridgeSrc = this.cambridgeBaseSrc + this.word
     }
   }
 }

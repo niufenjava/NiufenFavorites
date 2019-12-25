@@ -289,7 +289,6 @@
 </template>
 <script>
 import thirdDict from '@/components/ThirdDict'
-
 import mdInput from '@/components/MDinput'
 import { dictApi } from '@/api/dict'
 export default {

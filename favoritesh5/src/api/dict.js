@@ -24,10 +24,11 @@ export class dictApi {
     })
   }
 
-  static wordList() {
+  static wordList(params) {
     return request({
       url: uri + 'word/list',
-      method: 'get'
+      method: 'post',
+      data: params
     })
   }
 }

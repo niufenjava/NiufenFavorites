@@ -1,5 +1,6 @@
 package io.renren.dict.service;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 
@@ -12,10 +13,8 @@ import io.renren.dict.entity.DictWordDefExampleEntity;
 import io.renren.dict.entity.DictWordEntity;
 import io.renren.dict.entity.DictWordEtymaRelEntity;
 import io.renren.dict.enums.WordDefTypeEnum;
-import io.renren.dict.form.WordDegreeForm;
-import io.renren.dict.form.WordForm;
-import io.renren.dict.form.WordDefExampleForm;
-import io.renren.dict.form.WordDefForm;
+import io.renren.dict.enums.WordSortTypeEnum;
+import io.renren.dict.form.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,11 +65,16 @@ public class DictService {
         return wordNameList;
     }
 
-    public List<WordSimpleBO> listWordName(){
+    public List<WordSimpleBO> listWordName(WordListQueryForm queryForm){
         List<WordSimpleBO> wordNameList = ListUtils.newLinkedList();
-        List<DictWordEntity> entityList = wordService.list(new QueryWrapper<DictWordEntity>()
-                .orderByAsc("name")
-        );
+        QueryWrapper wrapper = new QueryWrapper<DictWordEntity>();
+        if(ObjectTools.in(queryForm.getSortType(),WordSortTypeEnum.DEFAULT.getIndex())){
+            wrapper.orderByAsc(WordSortTypeEnum.getSqlByIndex(queryForm.getSortType()));
+
+        }else{
+            wrapper.orderByDesc(WordSortTypeEnum.getSqlByIndex(queryForm.getSortType()));
+        }
+        List<DictWordEntity> entityList = wordService.list(wrapper);
         if(!CollectionUtils.isEmpty(entityList)){
             for (DictWordEntity wordEntity : entityList) {
                 WordSimpleBO simpleBO = new WordSimpleBO();
@@ -89,7 +93,12 @@ public class DictService {
 
         List<Long> eytmaIds = ListUtils.newLongList();
         DictWordEntity wordEntity = wordService.getByName(word);
+
         if (ObjectTools.isNotNull(wordEntity)) {
+
+            wordEntity.setQueryCount(wordEntity.getQueryCount()+1);
+            wordService.saveOrUpdate(wordEntity);
+
             wordForm.setId(wordEntity.getId());
             wordForm.setName(wordEntity.getName());
             wordForm.setSoundmark(wordEntity.getSoundmark());
@@ -143,6 +152,7 @@ public class DictService {
 
     @Transactional(rollbackFor = Exception.class)
     public void wordCreateOrUpdate(WordForm wordForm) {
+
         // 如果ID为空，则新建
         DictWordEntity wordEntity = wordService.getByName(wordForm.getName());
 

@@ -13,7 +13,8 @@ export default new Vuex.Store({
     // 浏览器底部栏高度
     mainFooterHeight: 30,
     // 浏览器主体高度
-    mainBodyHeight: 440
+    mainBodyHeight: 440,
+    dictWordListOrderType: 1
   },
   mutations: {
     increment(state) {

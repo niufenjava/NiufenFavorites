@@ -8,13 +8,17 @@
       type="success"
       @click="changeClientHeight"
     >changeClientHeight</el-button>
-    <el-alert type="success">count</el-alert>
-    <el-alert type="success">clientHeight:{{ clientHeight }}</el-alert>
-    <el-alert type="success">styleVarTopHeight:{{ styleVarTopHeight }}</el-alert>
-    <el-alert type="success">mainHeaderHeight:{{ mainHeaderHeight }}px</el-alert>
-    <el-alert type="success">mainBodyHeight:{{ mainBodyHeight }}px</el-alert>
-    <el-alert type="success">mainFooterHeight:{{ mainFooterHeight }}px</el-alert>
-    <div class="test-class">test-class</div>
+    <div id="divId">
+      <el-alert type="success">count</el-alert>
+      <el-alert type="success">clientHeight:{{ clientHeight }}</el-alert>
+      <el-alert type="success">styleVarTopHeight:{{ styleVarTopHeight }}</el-alert>
+      <el-alert type="success">mainHeaderHeight:{{ mainHeaderHeight }}px</el-alert>
+      <el-alert type="success">mainBodyHeight:{{ mainBodyHeight }}px</el-alert>
+      <el-alert type="success">mainFooterHeight:{{ mainFooterHeight }}px</el-alert>
+      <el-alert type="success">divHeight:{{ divHeight }}px</el-alert>
+
+      <div class="test-class">test-class</div>
+    </div>
   </div>
 </template>
 <script>
@@ -26,7 +30,8 @@ export default {
     return {
        theme: false,
       styleVarTopHeight: 'mainHeaderHeight:' + styleVar.mainHeaderHeight,
-      value: null
+      value: null,
+      divHeight: null
     }
   },
   computed: {
@@ -59,7 +64,16 @@ export default {
   },
   created: function () {
   },
+
+  mounted () {
+    // 获取浏览器可视区域高度
+    this.divHeight = document.getElementById('divId').offsetHeight
+    console.info('this.$refs.divRef.clientHeight:' + document.getElementById('divId').clientHeight)
+    console.info('this.$refs.divRef.offsetHeight:' + document.getElementById('divId').offsetHeight)
+        console.info('this.$refs.divRef.scrollHeight:' + document.getElementById('divId').scrollHeight)
+  },
   methods: {
+
     increment() {
       this.$store.commit('increment')
     },

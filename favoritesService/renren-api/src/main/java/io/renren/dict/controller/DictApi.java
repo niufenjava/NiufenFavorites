@@ -4,6 +4,7 @@ import io.renren.common.utils.R;
 import io.renren.dict.entity.DictArticleEntity;
 import io.renren.dict.form.WordDegreeForm;
 import io.renren.dict.form.WordForm;
+import io.renren.dict.form.WordListQueryForm;
 import io.renren.dict.service.DictService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -44,8 +45,8 @@ public class DictApi {
      * 信息
      */
     @RequestMapping("/word/list")
-    public R wordList(){
-        return R.ok().put("wordList", dictService.listWordName());
+    public R wordList(@RequestBody  WordListQueryForm queryForm){
+        return R.ok().put("wordList", dictService.listWordName(queryForm));
     }
 
     @RequestMapping("/word/degree")

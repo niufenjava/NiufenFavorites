@@ -41,6 +41,8 @@
                 :filter-node-method="filterNode"
                 node-key="id"
                 check-on-click-node
+                :default-expanded-keys="[1]"
+                :default-checked-keys="[1]"
                 auto-expand-parent
                 highlight-current
                 :expand-on-click-node="false"
@@ -89,7 +91,6 @@
               <el-rate
                 v-model="word.degree"
                 style="display:inline;margin-left:20px;float:right"
-                :texts="rateTexts"
                 :colors="rateColors"
                 @change="rateChange"
               />
@@ -143,29 +144,13 @@
           >
             <!-- 新增单词按钮 -->
             <el-row>
-              <el-col :span="12">
+              <el-col :span="24">
                 <el-button
                   size="small"
                   style="margin:10px"
                   type="primary"
                   @click="addWordClick"
                 >关联单词</el-button>
-              </el-col>
-              <el-col :span="12">
-                <el-dropdown
-                  size="small"
-                  style="float:right;margin-top:15px;"
-                >
-                  <span class="el-dropdown-link">
-                    默认排序<i class="el-icon-arrow-down el-icon--right" />
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>默认排序</el-dropdown-item>
-                    <el-dropdown-item>熟悉程度</el-dropdown-item>
-                    <el-dropdown-item>查询次数</el-dropdown-item>
-                    <el-dropdown-item>修改时间</el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
               </el-col>
             </el-row>
             <el-row>
@@ -235,7 +220,7 @@
   </div>
 </template>
 <script>
-import editWord from '@/views/EditWord.vue'
+import editWord from '@/views/Dict/EditWord.vue'
 import MDView from '@/components/MDView'
 import { dictApi } from '@/api/dict'
 import { notebookApi } from '@/api/notebook'
@@ -280,9 +265,7 @@ export default {
       searchInput: null,
       collapseActiveIds: [0, 1, 2, 3, 4],
       value: '',
-      iconClasses: ['icon-rate-face-1', 'icon-rate-face-2', 'icon-rate-face-3'], // 等同于 { 2: 'icon-rate-face-1', 4: { value: 'icon-rate-face-2', excluded: true }, 5: 'icon-rate-face-3' }
       rateColors: ['#99A9BF', '#F7BA2A', '#FF9900'], // 等同于 { 2: '#99A9BF', 4: { value: '#F7BA2A', excluded: true }, 5: '#FF9900' }
-      rateTexts: ['未知', '失望', '一般', '良好', '掌握'],
       word: {
         name: '',
         symbol: '',
@@ -291,8 +274,7 @@ export default {
         ],
         skillDesc: '',
         etymaIdList: []
-      },
-      clientHeight: ''
+      }
     }
   },
   computed: {
@@ -304,13 +286,6 @@ export default {
     filterText(val) {
         this.$refs.tree.filter(val)
       },
-    // 如果 `clientHeight` 发生改变，这个函数就会运行
-    clientHeight: function () {
-      this.changeFixed(this.clientHeight)
-    },
-    word: function () {
-      // this.$refs.thirdDictRef.open(this.word.name)
-    },
     noteSwitch: function () {
       if (this.noteSwitch) {
         this.$refs.mdview.open(this.note.content)
@@ -320,15 +295,6 @@ export default {
   created() {
     this.wordListInit()
     this.getTree()
-  },
-  mounted () {
-    // 获取浏览器可视区域高度
-    this.clientHeight = `${document.documentElement.clientHeight}`
-    // document.body.clientWidth;
-    // console.log(self.clientHeight);
-    window.onresize = function temp () {
-      this.clientHeight = `${document.documentElement.clientHeight}`
-    }
   },
 
   methods: {
@@ -364,7 +330,6 @@ export default {
       })
     },
     getTree() {
-      // this.$refs.tree.setCheckedKeys([]);
       const _ = this
       notebookApi.noteTree().then(response => {
         console.info('response.tree', response)
@@ -463,16 +428,9 @@ export default {
         this.$refs.tree.setCurrentKey(this.curTreeKey)
         this.$refs.tree.store.nodesMap[node.id].expanded = true
         this.getNoteDetail()
-        // this.getTree()
       }).catch(err => {
         console.log(err)
       })
-        // let id = 0
-        // const newChild = { id: id++, label: 'testtest', children: [] }
-        // if (!data.children) {
-        //   this.$set(data, 'children', [])
-        // }
-        // data.children.push(newChild)
       },
 
       getCurrentNode() {
@@ -517,23 +475,6 @@ export default {
         .catch(err => {
           console.log(err)
         })
-      // this.wordListInit()
-      // this.wordInfo(this.word.name)
-    },
-    wordInfo(word) {
-      dictApi.wordInfo(word).then(response => {
-        console.info(response)
-        this.word = response.word
-        this.collapseActiveIds = []
-        if (this.word.defList) {
-        for (let index = 0; index < this.word.defList.length; index++) {
-          const element = this.word.defList[index]
-          this.collapseActiveIds.push(element.id)
-        }
-      }
-      }).catch(err => {
-        console.log(err)
-      })
     },
     getNoteDetail() {
       const curNode = this.getCurrentNode()
@@ -541,16 +482,6 @@ export default {
         this.note = response.note
         this.wordListInit()
       })
-    },
-    clickWord(word) {
-      this.initSearch()
-      for (let i = 0; i < this.wordList.length; i++) {
-        const item = this.wordList[i]
-        if (item.name === word) {
-          item.type = 'primary'
-        }
-      }
-      this.wordInfo(word)
     },
     wordClick (word) {
       this.$refs.editWordComp.open(null, word)
@@ -589,16 +520,6 @@ export default {
       this.wordList.forEach(element => {
         element.type = 'default'
       })
-    },
-    changeFixed (clientHeight) {
-      // 动态修改样式
-      // console.log(clientHeight);
-      // console.log(this.$refs.baiduHeight.$el.style)
-      // this.$refs.wordAside.$el.style.height = clientHeight - 165 + 'px'
-      this.$refs.listRef.style.height = clientHeight - 190 + 'px'
-      // this.$refs.wordMain.$el.style.height = clientHeight - 160 + 'px'
-      this.$refs.thirdDictHeight.$el.style.height = clientHeight - 165 + 'px'
-      this.$refs.wordDetailMain.style.height = clientHeight - 240 + 'px'
     },
     cancelRelWord (wordId) {
       notebookApi.noteRelWordDelete({ 'id': this.note.id, 'wordId': wordId })

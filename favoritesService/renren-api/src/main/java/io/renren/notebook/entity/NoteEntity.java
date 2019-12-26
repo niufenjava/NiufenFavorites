@@ -37,6 +37,14 @@ public class NoteEntity implements Serializable {
 	 */
 	private Integer type;
 	/**
+	 * 查询次数
+	 */
+	private Integer queryCount;
+	/**
+	 * 熟悉程度
+	 */
+	private Integer degree;
+	/**
 	 * 描述/备注
 	 */
 	private String descp;

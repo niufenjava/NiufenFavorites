@@ -60,6 +60,22 @@
           <el-row style="background-color:white">
             <el-scrollbar>
               <div :style="getWordViewMainStyle()">
+                <div
+                  v-if="word.plural || word.thirdSingular || word.presentParticiple ||
+                    word.pastParticiple || word.pastTense || word.other
+                  "
+                  style="margin:10px;"
+                >
+                  <h4>变形</h4>
+                  <div>
+                    <span v-if="word.plural">复数：{{ word.plural }}；</span>
+                    <span v-if="word.thirdSingular">第三人称单数：{{ word.thirdSingular }}；</span>
+                    <span v-if="word.presentParticiple">现在分词：{{ word.presentParticiple }}；</span>
+                    <span v-if="word.pastParticiple">过去分词：{{ word.pastParticiple }}；</span>
+                    <span v-if="word.pastTense">过去式：{{ word.pastTense }}；</span>
+                    <span v-if="word.other">其他{{ word.other }}；</span>
+                  </div>
+                </div>
                 <div style="margin:10px;">
                   <h4>单词解释</h4>
                   <el-collapse v-model="collapseActiveIds">
@@ -106,7 +122,7 @@
                   </el-collapse>
 
                   <h4>记忆技巧</h4>
-                  <div style="background-color:white;margin-bottom:200px;">
+                  <div style="background-color:white;margin-bottom:100px;">
                     <span>{{ word.skillDesc }}</span>
                   </div>
                 </div>
@@ -128,7 +144,7 @@
     </el-row>
     <editWord
       ref="editWordComp"
-      @parentCallback="init"
+      @parentCallback="editWordCallback"
     />
   </div>
 </template>
@@ -191,6 +207,10 @@ export default {
     this.init()
   },
   methods: {
+
+  editWordCallback(id) {
+    this.wordInfo(this.word.name)
+  },
     open(word) {
       this.word.name = word
       this.wordInfo(this.word.name)
@@ -223,6 +243,7 @@ export default {
           const element = this.word.defList[index]
           this.collapseActiveIds.push(element.id)
         }
+        this.$forceUpdate()
       }
       }).catch(err => {
         console.log(err)

@@ -30,7 +30,7 @@
                     v-model="word.soundmark"
                     style="margin-left:20px;"
                     placeholder="音标"
-                    @blur="saveWord"
+                    @blur="saveWord(false)"
                   >Soundmark</md-input>
                 </el-col>
                 <el-col
@@ -59,7 +59,7 @@
                         v-model="word.plural"
                         style="margin-top:20px"
                         placeholder="复数"
-                        @blur="saveWord"
+                        @blur="saveWord(false)"
                       >复数</md-input>
                     </el-col>
                     <el-col :span="8">
@@ -67,7 +67,7 @@
                         v-model="word.thirdSingular"
                         style="margin-top:20px"
                         placeholder="第三人称单数"
-                        @blur="saveWord"
+                        @blur="saveWord(false)"
                       >第三人称单数</md-input>
                     </el-col>
                     <el-col :span="8">
@@ -75,7 +75,7 @@
                         v-model="word.presentParticiple"
                         style="margin-top:20px"
                         placeholder="现在分词"
-                        @blur="saveWord"
+                        @blur="saveWord(false)"
                       >现在分词</md-input>
                     </el-col>
                   </el-row>
@@ -86,7 +86,7 @@
                         v-model="word.pastParticiple"
                         style="margin-top:20px"
                         placeholder="过去分词"
-                        @blur="saveWord"
+                        @blur="saveWord(false)"
                       >过去分词</md-input>
                     </el-col>
                     <el-col :span="8">
@@ -94,7 +94,7 @@
                         v-model="word.pastTense"
                         style="margin-top:20px"
                         placeholder="过去式"
-                        @blur="saveWord"
+                        @blur="saveWord(false)"
                       >过去式</md-input>
                     </el-col>
                     <el-col :span="8">
@@ -102,7 +102,7 @@
                         v-model="word.other"
                         style="margin-top:20px"
                         placeholder="其他"
-                        @blur="saveWord"
+                        @blur="saveWord(false)"
                       >其他</md-input>
                     </el-col>
                   </el-row>
@@ -137,7 +137,7 @@
                     <el-row style="margin-bottom:10px;">
                       <el-radio-group
                         v-model="def.type"
-                        @change="saveWord"
+                        @change="saveWord(false)"
                       >
                         <el-radio :label="1">n.</el-radio>
                         <el-radio :label="2">v.</el-radio>
@@ -154,7 +154,7 @@
                         v-model="def.name"
                         style="margin-top:30px;"
                         placeholder="definition"
-                        @blur="saveWord"
+                        @blur="saveWord(false)"
                       >释义</md-input>
                     </el-row>
                     <div>
@@ -163,7 +163,7 @@
                           v-model="def.explainEn"
                           style="margin-top:40px;"
                           placeholder="explainEn"
-                          @blur="saveWord"
+                          @blur="saveWord(false)"
                         >英文解释</md-input>
                       </div>
                       <div>
@@ -171,7 +171,7 @@
                           v-model="def.explainCh"
                           style="margin-top:40px;"
                           placeholder="explainCh"
-                          @blur="saveWord"
+                          @blur="saveWord(false)"
                         >中文解释</md-input>
                       </div>
                     </div>
@@ -186,7 +186,7 @@
                           v-model="example.exampleEn"
                           style="margin-top:10px;"
                           placeholder="exampleEn"
-                          @blur="saveWord"
+                          @blur="saveWord(false)"
                         />
                         <el-row>
                           <el-col :span="20">
@@ -194,7 +194,7 @@
                               v-model="example.exampleCh"
                               style="margin-top:10px;"
                               placeholder="exampleCh"
-                              @blur="saveWord"
+                              @blur="saveWord(false)"
                             />
                           </el-col>
                           <el-col
@@ -245,7 +245,7 @@
                     v-model="word.skillDesc"
                     style="margin-bottom:20px;margin-top:40px"
                     placeholder="记忆技巧"
-                    @blur="saveWord"
+                    @blur="saveWord(false)"
                   >记忆技巧</md-input>
 
                 </div>
@@ -336,6 +336,7 @@ export default {
     },
     delExplain (index) {
       this.word.defList.splice(index, 1)
+      this.saveWord(false)
     },
     addExample (list, def) {
       if (list === undefined || list === null) {
@@ -347,6 +348,7 @@ export default {
     },
     delExample (index, list) {
       list.splice(index, 1)
+      this.saveWord(false)
     },
     // 关闭抽屉前调用方法
     closeDrawerBefore (done) {
@@ -367,20 +369,22 @@ export default {
       this.wordInfo()
       this.drawer = true
     },
-    saveWord () {
+    saveWord (close) {
       if (!this.word || this.word === null || this.word === '') {
         return
       }
       dictApi.wordCreateOrUpdate(this.word).then(response => {
         console.info(response)
-        // this.wordInfo()
+        if (close) {
+             this.drawer = false
+             this.$emit('parentCallback', this.word.id)
+        }
       }).catch(err => {
         console.log(err)
       })
     },
     handleSaveWord() {
-      this.drawer = false
-      this.saveWord()
+      this.saveWord(true)
     }
   }
 }

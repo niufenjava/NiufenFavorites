@@ -63,4 +63,11 @@ export class notebookApi {
       data: note
     })
   }
+  static noteDegree(degree) {
+    return request({
+      url: uri + 'note/degree',
+      method: 'post',
+      data: degree
+    })
+  }
 }

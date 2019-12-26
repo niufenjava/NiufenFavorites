@@ -9,6 +9,8 @@
         <result property="parentId" column="parent_id"/>
         <result property="name" column="name"/>
         <result property="type" column="type"/>
+        <result property="degree" column="degree"/>
+        <result property="queryCount" column="query_count"/>
         <result property="descp" column="descp"/>
         <result property="createTime" column="create_time"/>
         <result property="modifyTime" column="modify_time"/>

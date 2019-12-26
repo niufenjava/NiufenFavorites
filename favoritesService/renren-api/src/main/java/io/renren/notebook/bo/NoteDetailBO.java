@@ -20,4 +20,6 @@ public class NoteDetailBO implements Serializable {
     private String title;
 
     private String content;
+
+    private Integer degree;
 }

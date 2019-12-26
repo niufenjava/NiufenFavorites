@@ -1,6 +1,7 @@
 package io.renren.notebook.controller;
 
 import io.renren.common.utils.R;
+import io.renren.dict.form.WordDegreeForm;
 import io.renren.notebook.form.*;
 import io.renren.notebook.service.NotebookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,12 @@ public class NotebookApi {
     @RequestMapping("/note/tree")
     public R noteTree(){
         return R.ok().put("tree",notebookService.noteTree());
+    }
+
+    @RequestMapping("/note/degree")
+    public R wordDegree(@RequestBody NoteDegreeForm degreeForm){
+        notebookService.noteDegree(degreeForm);
+        return R.ok();
     }
 
 }

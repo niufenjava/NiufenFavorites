@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+// import Home from '../views/Home.vue'
 import Todo from '../views/Todo.vue'
 import Layout from '@/layout'
 Vue.use(VueRouter)
@@ -11,7 +11,8 @@ const routes = [{
     redirect: '/home',
     children: [{
       path: '/home',
-      component: Home,
+      // component: Home,
+      component: () => import('@/views/notebook/note.vue'),
       name: 'Home'
     }]
   },
@@ -55,7 +56,7 @@ const routes = [{
     component: Layout,
     children: [{
       path: '/notebook',
-      component: () => import('@/views/Notebook.vue'),
+      component: () => import('@/views/notebook'),
       name: 'Notebook'
     }]
   }

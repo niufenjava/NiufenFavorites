@@ -7,6 +7,8 @@ import io.renren.common.exception.RRException;
 import io.renren.common.utils.ListUtils;
 import io.renren.common.utils.ObjectTools;
 import io.renren.dict.bo.WordSimpleBO;
+import io.renren.dict.entity.DictWordEntity;
+import io.renren.dict.form.WordDegreeForm;
 import io.renren.dict.service.DictService;
 import io.renren.notebook.bo.NoteBO;
 import io.renren.notebook.bo.NoteDetailBO;
@@ -35,6 +37,12 @@ public class NotebookService {
     private NoteWordRelService noteWordRelService;
     @Autowired
     private DictService dictService;
+
+    public void noteDegree(NoteDegreeForm degreeForm){
+        NoteEntity noteEntity = noteService.getById(degreeForm.getId());
+        noteEntity.setDegree(degreeForm.getDegree());
+        noteService.saveOrUpdate(noteEntity);
+    }
 
     public List<WordSimpleBO> listRelWord(Long noteId){
         List wordSimpleBOList = ListUtils.newLinkedList();
@@ -100,6 +108,7 @@ public class NotebookService {
         NoteEntity noteEntity = noteService.getById(id);
         NoteContentEntity contentEntity = noteContentService.getByNoteId(id);
         detailBO.setId(id);
+        detailBO.setDegree(noteEntity.getDegree());
         detailBO.setTitle(noteEntity.getName());
         if(ObjectTools.isNotNull(contentEntity)){
             detailBO.setContent(contentEntity.getContent());

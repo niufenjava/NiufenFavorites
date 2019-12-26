@@ -24,7 +24,10 @@
         :key="item.id"
         style="width:200px;height:80px;float: left;margin-right:10px;margin-bottom:10px;"
       >
-        <el-badge :value="item.count" class="item">
+        <el-badge
+          :value="item.count"
+          class="item"
+        >
           <el-card shadow="hover">
             <el-row>
               <el-col :span="2">
@@ -220,11 +223,11 @@ export default {
 }
 </script>
 <style>
-.el-header{
-  padding:0px !important;
+.el-header {
+  padding: 0px !important;
 }
 .el-card__body {
-    padding: 15px !important;
+  padding: 15px !important;
 }
 .item {
   margin-top: 10px;

@@ -45,6 +45,7 @@
               autocomplete="on"
               clearable
               @input="search"
+              @keyup.enter.native="keyupEnter"
             />
           </el-row>
         </div>
@@ -191,7 +192,15 @@ export default {
       })
     },
     clickWord(word) {
-      this.curWordName = word
+      if (word === null || word === undefined) {
+          this.curWordName = this.searchInput
+      } else {
+        this.curWordName = word
+      }
+    },
+
+    keyupEnter() {
+      this.clickWord(this.searchInput)
     },
     addWordClick () {
       this.$refs.addWordComp.open(null, this.searchInput)

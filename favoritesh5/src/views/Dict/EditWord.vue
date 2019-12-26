@@ -352,7 +352,7 @@ export default {
     },
     // 关闭抽屉前调用方法
     closeDrawerBefore (done) {
-      this.$emit('parentCallback', this.word.id)
+      this.$emit('parentCallback', this.word.id, this.word.name)
       done()
       // this.drawer = false
     },
@@ -377,7 +377,7 @@ export default {
         console.info(response)
         if (close) {
              this.drawer = false
-             this.$emit('parentCallback', this.word.id)
+             this.$emit('parentCallback', this.word.id, this.word.name)
         }
       }).catch(err => {
         console.log(err)

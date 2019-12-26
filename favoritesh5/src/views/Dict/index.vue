@@ -160,8 +160,11 @@ export default {
         this.$store.state.dictWordListOrderType = command
         this.wordListQuery()
     },
-    addWordCallback(word) {
-      if (word && word !== null && word !== '') { this.curWordName = word }
+    addWordCallback(wordId, wordName) {
+      if (wordName && wordName !== null && wordName !== '') {
+        this.curWordName = wordName
+        this.wordListQuery()
+        }
     },
     getAsiderWordListStyle() {
       return 'height:' + (this.mainBodyHeight - this.asiderTopHeight) + 'px'

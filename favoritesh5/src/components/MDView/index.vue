@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div style="height:100%;width:100%;background-color:#FFF;border-radius: 4px 4px 4px 4px;">
     <div
       ref="hlDiv"
-      style="height:500px"
+      style="height:95%"
       class="hljs"
       @mouseup="selectText"
       v-html="code"
@@ -19,7 +19,8 @@
     name: 'Height',
     data() {
       return {
-        code: '```javascript\nfunction(){\n\tconsole.log(123)\n}\n```'
+        showChFlag: true,
+        code: ''
       }
     },
     mounted() {
@@ -54,11 +55,37 @@
     }
     },
   // 打开抽屉方法
-    open (content) {
-      const list = ['patterns', 'significances']
-      content = this.highlight(content, list)
-      console.info('content', content)
-      this.code = marked(content)
+    open (content, showChFlag, wordList) {
+      const wordSignList = []
+      if (wordList) {
+        wordList.forEach(word => {
+          word.changeList.forEach(change => {
+            wordSignList.push(change)
+          })
+        })
+      }
+      console.info('wordSignList', wordSignList)
+      console.info('showChFlag', showChFlag)
+      let newContent = ''
+      if (!showChFlag) {
+        const line = /[\n\r]/
+        const array = content.split(line)
+        console.info('array.size', array.length)
+        array.forEach(element => {
+          if (element.length > 1 && element.startsWith('*') && element.endsWith('*')) {
+            console.info(element)
+          } else {
+                        console.info(element)
+
+            newContent = newContent + element + '\n\r'
+          }
+        })
+        console.info(showChFlag)
+      } else {
+        newContent = content
+      }
+      newContent = this.highlight(newContent, wordSignList)
+      this.code = marked(newContent)
     },
     // 匹配整个关键词 不拆分
     highlight(text, words, tag) {
@@ -80,6 +107,10 @@
 <style>
 .hljs p {
   font-size: 20px;
+}
+.hljs {
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 12px 0px;
+  border-radius: 4px 4px 4px 4px;
 }
 .highlight {
   background: yellow;

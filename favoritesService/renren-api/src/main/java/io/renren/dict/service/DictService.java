@@ -59,10 +59,37 @@ public class DictService {
                 simpleBO.setId(wordEntity.getId());
                 simpleBO.setName(wordEntity.getName());
                 simpleBO.setDescp(wordEntity.getDescp());
+                simpleBO.setChangeList(this.toChangeList(wordEntity));
                 wordNameList.add(simpleBO);
             }
         }
         return wordNameList;
+    }
+
+    private List<String> toChangeList(DictWordEntity wordEntity){
+        List<String> changeList = ListUtils.newStringList();
+        if(ObjectTools.isNotNull(wordEntity.getName())){
+            changeList.add(wordEntity.getName());
+        }
+        if(ObjectTools.isNotNull(wordEntity.getOther())){
+            changeList.add(wordEntity.getOther());
+        }
+        if(ObjectTools.isNotNull(wordEntity.getPastParticiple())){
+            changeList.add(wordEntity.getPastParticiple());
+        }
+        if(ObjectTools.isNotNull(wordEntity.getPastTense())){
+            changeList.add(wordEntity.getPastTense());
+        }
+        if(ObjectTools.isNotNull(wordEntity.getPlural())){
+            changeList.add(wordEntity.getPlural());
+        }
+        if(ObjectTools.isNotNull(wordEntity.getPresentParticiple())){
+            changeList.add(wordEntity.getPresentParticiple());
+        }
+        if(ObjectTools.isNotNull(wordEntity.getThirdSingular())){
+            changeList.add(wordEntity.getThirdSingular());
+        }
+        return changeList;
     }
 
     public List<WordSimpleBO> listWordName(WordListQueryForm queryForm){

@@ -106,6 +106,9 @@ public class NotebookService {
     public NoteDetailBO noteDetail(Long id){
         NoteDetailBO detailBO = new NoteDetailBO();
         NoteEntity noteEntity = noteService.getById(id);
+        if(ObjectTools.isNull(noteEntity)){
+            return detailBO;
+        }
         NoteContentEntity contentEntity = noteContentService.getByNoteId(id);
         detailBO.setId(id);
         detailBO.setDegree(noteEntity.getDegree());

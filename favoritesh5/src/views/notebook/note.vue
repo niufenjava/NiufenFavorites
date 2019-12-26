@@ -1,151 +1,169 @@
 <template>
-  <div>
-    <el-container>
-      <el-row
-        style="height:100%"
-        :gutter="20"
+  <div style="margin:10px;">
+    <el-row
+      style="height:100%"
+      :gutter="20"
+    >
+      <!-- 我的词典详情显示区域 -->
+      <el-col :span="myWordCol">
+        <el-row>
+          <el-switch
+            v-model="noteEditMode"
+            style=""
+            active-text="编辑"
+            inactive-text="阅读"
+          />
+
+          <!-- 隐藏/显示三方词典 图标按钮 -->
+          <el-link
+            style="float:right;font-size:20px;margin-left:10px"
+            @click="showRelWordListFlag=!showRelWordListFlag"
+          >
+            <i
+              v-if="showRelWordListFlag"
+              class="el-icon-s-unfold"
+            />
+            <i
+              v-if="!showRelWordListFlag"
+              class="el-icon-s-fold"
+            />
+          </el-link>
+
+          <!-- 评分 -->
+          <el-rate
+            v-model="note.degree"
+            style="display:inline;margin-left:20px;float:right"
+            :colors="rateColors"
+            @change="rateChange"
+          />
+
+          <!-- 中英切换 -->
+          <el-switch
+            v-show="!noteEditMode"
+            v-model="showChFlag"
+            active-text="中英"
+            style="margin-left:20px;"
+            inactive-text="全英"
+            @click="showChFlag =!showChFlag"
+          />
+        </el-row>
+        <!-- 第一行，主要显示区域 -->
+        <el-row style="margin-top:10px;">
+          <el-input
+            v-model="note.title"
+            placeholder="标题"
+            @blur="blueTitleChange"
+          />
+
+          <!-- 我是一个分割线 -->
+          <!-- 折叠面板。循环，单词详细解释 -->
+          <el-row style="margin-top:10px;">
+            <div :style="getMdViewAndEditStyle()">
+              <mavon-editor
+                v-show="noteEditMode"
+                v-model="note.content"
+                style="height:100%;"
+                fontSize="24px"
+                placeholder=""
+                codeStyle="vs"
+                previewBackground="transparent"
+                toolbarsBackground="transparent"
+                :navigation="false"
+                @save="contentChange"
+              />
+              <MDView
+                v-show="!noteEditMode"
+                ref="mdview"
+                @callback="mdViewSelectWordCallback"
+              >
+                {{ note.content }}
+              </MDView>
+            </div>
+          </el-row>
+        </el-row>
+      </el-col>
+
+      <!-- 关联单词区域 -->
+      <el-col
+        v-show="showRelWordListFlag"
+        ref="thirdDictHeight"
+        :span="thirdWordCol"
       >
-        <!-- 我的词典详情显示区域 -->
-        <el-col :span="myWordCol">
-          <el-row>
-            <el-switch
-              v-model="noteEditMode"
-              style="margin-bottom:5px;"
-              active-text="编辑"
-              inactive-text="阅读"
-            />
-            <el-rate
-              v-model="note.degree"
-              style="display:inline;margin-left:20px;float:right"
-              :colors="rateColors"
-              @change="rateChange"
-            />
+        <!-- 新增单词按钮 -->
+        <el-row style="margin-bottom:10px;">
+          <el-col :span="24">
+            <el-button
+              size="small"
+              type="primary"
+              @click="addWordRelClick"
+            >关联单词</el-button>
+          </el-col>
+        </el-row>
+        <el-row style="margin-bottom:10px;">
+          <el-input
+            v-model="searchInput"
+            placeholder="Search"
+            autocomplete="on"
+            clearable
+            @input="search"
+          />
+        </el-row>
 
-          </el-row>
-          <!-- 第一行，主要显示区域 -->
-          <el-row>
-            <el-input
-              v-model="note.title"
-              placeholder="标题"
-              @blur="blueTitleChange"
-            />
+        <el-scrollbar>
 
-            <!-- 我是一个分割线 -->
-            <!-- 折叠面板。循环，单词详细解释 -->
-            <el-row style="margin-top:10px;">
+          <div
+            ref="wordListRef"
+            :style="getRelWordListStyle()"
+          >
+            <el-card
+              v-for="(item, index) in wordList"
+              :key="item.id"
+              :index="index"
+              style="margin-bottom:5px"
+              shadow="hover"
+            >
               <div
-                ref="wordDetailMain"
-                style="width:100%;height:100%"
+                slot="header"
+                class="clearfix"
               >
-                <mavon-editor
-                  v-show="noteEditMode"
-                  v-model="note.content"
-                  style="height:100%;"
-                  fontSize="24px"
-                  placeholder=""
-                  codeStyle="vs"
-                  previewBackground="transparent"
-                  toolbarsBackground="transparent"
-                  :navigation="false"
-                  @save="contentChange"
-                />
-                <MDView
-                  v-show="!noteEditMode"
-                  ref="mdview"
-                  @callback="mdViewSelectWordCallback"
+                <span
+                  v-if="item.type === 'danger'"
+                  style="color:#F56C6C"
+                  @click="wordClick(item.name)"
+                >{{ item.name }}</span>
+                <span
+                  v-if="item.type !== 'danger'"
+                  style="color:#409EFF"
+                  @click="wordClick(item.name)"
+                >{{ item.name }}</span>
+                <el-link
+                  style="float: right; padding: 3px 0"
+                  :underline="false"
+                  @click="cancelRelWord(item.id)"
                 >
-                  {{ note.content }}
-                </MDView>
+                  <i class="el-icon-close el-icon--right" />
+                </el-link>
+
               </div>
-            </el-row>
-          </el-row>
-        </el-col>
+              <span style="white-space: initial !important;font-size:14px;">{{ item.descp }}</span>
+            </el-card>
+          </div>
+        </el-scrollbar>
+      </el-col>
 
-        <!-- 关联单词区域 -->
-        <el-col
-          ref="thirdDictHeight"
-          :span="thirdWordCol"
-        >
-          <!-- 新增单词按钮 -->
-          <el-row>
-            <el-col :span="24">
-              <el-button
-                size="small"
-                style="margin:10px"
-                type="primary"
-                @click="addWordRelClick"
-              >关联单词</el-button>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-input
-              v-model="searchInput"
-              style="margin:10px;width:200px;margin-top:0px;"
-              placeholder="Search"
-              autocomplete="on"
-              clearable
-              @input="search"
-            />
-          </el-row>
-          <el-container style="width:100%;height:100%;">
-            <el-scrollbar style="width:100%;height:100%;">
+    </el-row>
 
-              <div
-                ref="wordListRef"
-                style="width:100%;height:100%"
-              >
-                <el-card
-                  v-for="(item, index) in wordList"
-                  :key="item.id"
-                  :index="index"
-                  style="width:95%;margin-bottom:5px;"
-                  shadow="hover"
-                >
-                  <div
-                    slot="header"
-                    class="clearfix"
-                  >
-                    <span
-                      v-if="item.type === 'danger'"
-                      style="color:#F56C6C"
-                      @click="wordClick(item.name)"
-                    >{{ item.name }}</span>
-                    <span
-                      v-if="item.type !== 'danger'"
-                      style="color:#409EFF"
-                      @click="wordClick(item.name)"
-                    >{{ item.name }}</span>
-                    <el-link
-                      style="float: right; padding: 3px 0"
-                      :underline="false"
-                      @click="cancelRelWord(item.id)"
-                    >
-                      <i class="el-icon-close el-icon--right" />
-                    </el-link>
-
-                  </div>
-                  {{ item.descp }}
-                </el-card>
-              </div>
-            </el-scrollbar>
-          </el-container>
-        </el-col>
-
-      </el-row>
-
-      <!-- 单词编辑-组件 -->
-      <editWord
-        ref="editWordComp"
-        @parentCallback="init"
-      />
-    </el-container>
+    <!-- 单词编辑-组件 -->
+    <editWord
+      ref="editWordComp"
+      @parentCallback="editWordCompCallback"
+    />
 
   </div>
 </template>
 <script>
 import editWord from '@/views/Dict/EditWord.vue'
 import MDView from '@/components/MDView'
-import { dictApi } from '@/api/dict'
 import { notebookApi } from '@/api/notebook'
 
 export default {
@@ -154,9 +172,11 @@ export default {
   },
   data () {
     return {
+      showChFlag: true,
+      showRelWordListFlag: true,
       noteEditMode: true,
       wordList: [],
-      noteId: 43,
+      noteId: 1,
       note: {
         title: '',
         content: '',
@@ -169,7 +189,15 @@ export default {
       collapseActiveIds: [0, 1, 2, 3, 4],
       rateColors: ['#99A9BF', '#F7BA2A', '#FF9900'],
       timer: '',
-      curNoteContent: ''
+      curNoteContent: '',
+      mdViewAndEditTopHegiht: 110,
+      relWordListTopHegiht: 117
+    }
+  },
+
+  computed: {
+    mainBodyHeight() {
+      return this.$store.state.mainBodyHeight
     }
   },
   watch: {
@@ -180,6 +208,19 @@ export default {
     noteEditMode: function (newValue) {
       if (!newValue) {
         this.initMdViewComp()
+      }
+    },
+    // 监听笔记模式 true:编辑；false:阅读
+    showChFlag: function (newValue) {
+      this.initMdViewComp()
+    },
+    showRelWordListFlag (newValue, oldValue) {
+      console.info(newValue)
+      if (!newValue) {
+        this.myWordCol = 24
+      } else {
+        this.myWordCol = 18
+        this.thirdWordCol = 6
       }
     }
   },
@@ -198,9 +239,23 @@ export default {
     init(noteId) {
       this.noteId = noteId
     },
+    editWordCompCallback(wordId) {
+      notebookApi.noteRelWord({ 'id': this.note.id, 'wordId': wordId }).then(response => {
+        this.getRelWordListInit()
+      }).catch(err => {
+        console.log(err)
+      })
+    },
     // 阅读模式组件初始化
     initMdViewComp() {
-      this.$refs.mdview.open(this.note.content)
+      this.$refs.mdview.open(this.note.content, this.showChFlag, this.wordList)
+    },
+
+    getMdViewAndEditStyle() {
+      return 'width:100%;height:' + (this.mainBodyHeight - this.mdViewAndEditTopHegiht) + 'px'
+    },
+    getRelWordListStyle() {
+      return 'width:100%;height:' + (this.mainBodyHeight - this.relWordListTopHegiht) + 'px'
     },
     // 编辑完标题时触发
     blueTitleChange() {
@@ -209,6 +264,7 @@ export default {
         // console.info(node)
         // node.label = this.note.title
         // 这里需要调用父节点，并且父节点改名
+      this.$emit('parentCallback', this.note.title)
       }).catch(err => {
         console.log(err)
       })
@@ -228,6 +284,10 @@ export default {
     getRelWordListInit() {
       notebookApi.noteRelWordList(this.note.id).then(response => {
         this.wordList = response.wordList
+                this.$forceUpdate()
+                        this.initMdViewComp()
+
+                this.search()
       }).catch(err => {
         console.log(err)
       })
@@ -249,7 +309,6 @@ export default {
     getNoteDetail() {
       notebookApi.noteDetail(this.noteId).then(response => {
         this.note = response.note
-        this.initMdViewComp()
         this.getRelWordListInit()
       })
     },
@@ -271,12 +330,12 @@ export default {
       let scrollIndex = -1
       for (let i = 0; i < this.wordList.length; i++) {
         const word = this.wordList[i]
-        if (word.name.includes(this.searchInput, 0)) {
+        if (word.name.includes(this.searchInput, 0) || word.changeList.includes(this.searchInput, 0)) {
           word.type = 'danger'
           if (scrollIndex === -1) {
             scrollIndex = i
           }
-          if (word.name === this.searchInput) {
+          if (word.changeList.includes(this.searchInput, 0)) {
             scrollIndex = i
           }
         }
@@ -309,6 +368,12 @@ export default {
 }
 </script>
 <style>
+.el-card__body {
+  padding: 10px 10px;
+}
+.el-card__header {
+  padding: 5px 10px;
+}
 .markdown-body {
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;

@@ -29,4 +29,9 @@ public class WordSimpleBO implements Serializable {
      * 单词名称
      */
     private String descp;
+
+    /**
+     * 变形名称列表
+     */
+    private List<String> changeList;
 }

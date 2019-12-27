@@ -14,8 +14,8 @@ const service = axios.create({
     'Content-Type': 'application/json;charset=UTF-8'
   },
   // baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
-  baseURL: '/favorite-api/', // api 的 base_url
-
+  // baseURL: '/favorite-api/', // api 的 base_url
+  baseURL: 'http://localhost/favorite-api/', // api 的 base_url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 5000 // request timeout
 })

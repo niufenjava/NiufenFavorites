@@ -6,7 +6,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>favorite-api</artifactId>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<description>favorite-api</description>
 
 

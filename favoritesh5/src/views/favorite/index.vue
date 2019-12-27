@@ -105,7 +105,7 @@ export default {
   },
   data () {
     return {
-      typeId: 0,
+      typeId: null,
       typeList: [],
       curItemList: []
     }
@@ -117,7 +117,7 @@ export default {
   },
   created: function () {
     this.getTypeList()
-    this.typeId = 1
+    this.typeId = -1
   },
   methods: {
     clickFavorite(item, favorite) {

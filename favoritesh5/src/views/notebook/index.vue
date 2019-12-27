@@ -27,6 +27,7 @@
             <i class="el-icon-s-fold" />
           </el-link>
         </el-row>
+
         <!-- 单词搜索输入框 -->
         <el-row style="margin-top:7px">
           <el-input
@@ -38,11 +39,11 @@
         <el-row style="margin-top:10px;">
           <!-- 笔记本书 -->
           <el-scrollbar>
-            <!-- 这里应该是个树
-                 default-expand-all 是否默认展开所有节点
+            <!-- 这里应该是个树 default-expand-all 是否默认展开所有节点
              -->
             <el-tree
               ref="tree"
+              empty-text="未命名"
               :style="getTreeDivStyle()"
               class="filter-tree"
               :data="treeData"
@@ -76,6 +77,8 @@
           </el-scrollbar>
         </el-row>
       </el-aside>
+
+      <!-- 隐藏笔记树时显示 -->
       <el-aside
         v-show="!showTreeFlag"
         width="20px"
@@ -88,7 +91,8 @@
           <i class="el-icon-s-unfold" />
         </el-link>
       </el-aside>
-      <!-- v-if="word.name" -->
+
+      <!-- 笔记内容显示区域 -->
       <el-main>
         <noteComp
           ref="noteCompRef"
@@ -117,8 +121,8 @@ export default {
         children: [{}]
       }],
       defaultProps: {
-      children: 'children',
-      label: 'label'
+        children: 'children',
+        label: 'label'
       },
       filterText: '',
       curTreeKey: 1,
@@ -127,77 +131,108 @@ export default {
   },
 
   computed: {
-
+    // 监听显示区域高度
     mainBodyHeight() {
       return this.$store.state.mainBodyHeight
     }
   },
+
   watch: {
+    // 笔记监听搜索框
     filterText(val) {
         this.$refs.tree.filter(val)
       }
   },
+
   created() {
     this.getTree()
   },
 
   methods: {
+
+    // 笔记标题修改回调
     noteCompRefCallback(title) {
       this.note.label = title
     },
+
+    // 获取树的宽-高样式
     getTreeDivStyle() {
       return 'width:100%;height:' + (this.mainBodyHeight - this.treeTopHeight) + 'px'
     },
+
+    // 笔记树点击操作
     handleNodeClick() {
-      console.info()
       this.note = this.getCurrentNode()
-      console.info('this.note', this.note)
       this.$refs.noteCompRef.init(this.note.id)
     },
+
+    // 远程获取树节点信息
     getTree() {
       const _ = this
       notebookApi.noteTree().then(response => {
-        console.info('response.tree', response)
         _.treeData = response.tree
-      }).catch(err => {
-        console.log(err)
       })
     },
+
     handleDragStart(node, ev) {
-        console.log('drag start', node)
-      },
-      handleDragEnter(draggingNode, dropNode, ev) {
-        console.log('tree drag enter: ', dropNode.label)
-      },
-      handleDragLeave(draggingNode, dropNode, ev) {
-        console.log('tree drag leave: ', dropNode.label)
-      },
-      handleDragOver(draggingNode, dropNode, ev) {
-        console.log('tree drag over: ', dropNode.label)
-      },
-      handleDragEnd(draggingNode, dropNode, dropType, ev) {
-        console.log('tree drag end: ', dropNode && dropNode.label, dropType)
-      },
-      handleDrop(draggingNode, dropNode, dropType, ev) {
-        console.log('tree drop: ', dropNode.label, dropType)
-      },
-      allowDrop(draggingNode, dropNode, type) {
-        if (dropNode.data.label === '二级 3-1') {
-          return type !== 'inner'
-        } else {
-          return true
-        }
-      },
-      allowDrag(draggingNode) {
-        return draggingNode.data.label.indexOf('三级 3-2-2') === -1
-      },
+      // console.log('drag start', node)
+    },
+    handleDragEnter(draggingNode, dropNode, ev) {
+      // console.log('tree drag enter: ', dropNode.label)
+    },
+    handleDragLeave(draggingNode, dropNode, ev) {
+      // console.log('tree drag leave: ', dropNode.label)
+    },
+    handleDragOver(draggingNode, dropNode, ev) {
+      // console.log('tree drag over: ', dropNode.label)
+    },
+    handleDragEnd(draggingNode, dropNode, dropType, ev) {
+    let parentNode
+    if (dropType === 'inner') {
+      console.info('放到' + dropNode.label + '节点下面了')
+      parentNode = dropNode
+    } else {
+      console.info('放到' + dropNode.parent.label + '节点下面了')
+            parentNode = dropNode.parent
+    }
+
+          console.info(parentNode)
+
+      const childredIds = []
+      parentNode.childNodes.forEach(child => {
+        childredIds.push(child.key)
+      })
+      const data = { 'parentId': parentNode.key, 'childrenIds': childredIds }
+      notebookApi.noteSort(data).then(response => {
+
+      })
+      console.info(data)
+    },
+    handleDrop(draggingNode, dropNode, dropType, ev) {
+      // console.log('tree drop: ', dropNode.label, dropType)
+    },
+    allowDrop(draggingNode, dropNode, type) {
+      // ROOT笔记本不能拖拽
+      if (draggingNode.key === 1) {
+        return false
+      }
+      // 不能放置到 ROOT笔记本同一级别
+
+      if (dropNode.key === 1) {
+        return false
+      }
+      return true
+    },
+    allowDrag(draggingNode) {
+      return draggingNode.data.label.indexOf('三级 3-2-2') === -1
+    },
+
+    // 过滤笔记
     filterNode(value, data) {
         if (!value) return true
         return data.label.indexOf(value) !== -1
       },
-      setCheckedKeys() {
-        // this.$refs.tree.setCheckedKeys([this.curTreeKey]);
-      },
+
     // 树-添加子节点
     deleteNode() {
       const node = this.getCurrentNode()
@@ -214,15 +249,11 @@ export default {
           type: 'warning'
         }).then(() => {
           notebookApi.noteDelete({ 'id': node.id }).then(response => {
-            console.info(response)
             this.$refs.tree.remove(node)
               this.$notify.success({
                 title: '成功',
                 message: '删除笔记成功'
               })
-            // this.getTree()
-          }).catch(err => {
-            console.log(err)
           })
         }).catch(() => {
           this.$message({
@@ -231,6 +262,7 @@ export default {
           })
         })
     },
+    // 添加一个笔记
     append() {
       const node = this.getCurrentNode()
       if (node === undefined || node === null || node.length === 0) {
@@ -241,20 +273,19 @@ export default {
         return
       }
       notebookApi.noteCreate({ 'name': '未命名', 'patientId': node.id }).then(response => {
-        console.info(response)
         this.curTreeKey = response.id
         this.$refs.tree.append({ 'label': '未命名', 'id': this.curTreeKey }, node)
         this.$refs.tree.setCurrentKey(this.curTreeKey)
         this.$refs.tree.store.nodesMap[node.id].expanded = true
-      }).catch(err => {
-        console.log(err)
+        this.handleNodeClick()
       })
-      },
+    },
 
-      getCurrentNode() {
-        console.info(this.$refs.tree.getCurrentNode())
-        return this.$refs.tree.getCurrentNode()
-      }
+      // 获取当前选中节点
+    getCurrentNode() {
+      console.info(this.$refs.tree.getCurrentNode())
+      return this.$refs.tree.getCurrentNode()
+    }
   }
 }
 </script>

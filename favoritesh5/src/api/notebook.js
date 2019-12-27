@@ -16,6 +16,13 @@ export class notebookApi {
       data: note
     })
   }
+  static noteSort(form) {
+    return request({
+      url: uri + 'note/sort',
+      method: 'post',
+      data: form
+    })
+  }
   static noteRelWordDelete(node) {
     return request({
       url: uri + 'note/rel/word/delete',

@@ -12,7 +12,7 @@ const routes = [{
     children: [{
       path: '/home',
       // component: Home,
-      component: () => import('@/views/notebook/note.vue'),
+      component: () => import('@/views/favorite/edit.vue'),
       name: 'Home'
     }]
   },
@@ -28,9 +28,9 @@ const routes = [{
     path: '/',
     component: Layout,
     children: [{
-      path: '/WebSite',
-      component: () => import('@/views/WebSite.vue'),
-      name: 'WebSite'
+      path: '/favorite',
+      component: () => import('@/views/favorite'),
+      name: 'favorite'
     }]
   },
   {

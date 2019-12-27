@@ -197,4 +197,30 @@ CREATE TABLE `t_note_word_rel` (
                           PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='笔记本-笔记内容-单词关联表';
 
+DROP TABLE IF EXISTS `t_favorite_type`;
+CREATE TABLE `t_favorite_type` (
+                                  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+                                  `name` varchar(255) NOT NULL COMMENT '收藏夹类型名称',
+                                  `icon` varchar(255) DEFAULT NULL COMMENT '收藏夹图标名称',
+                                  `sn` int(10) NOT NULL COMMENT '顺序号',
+                                  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                  `modify_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+                                  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='收藏夹-类型';
+
+DROP TABLE IF EXISTS `t_favorite_website`;
+CREATE TABLE `t_favorite_website` (
+                                   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+                                   `type_id` text NOT NULL COMMENT '搜藏夹类型ID',
+                                   `name` varchar(255) NOT NULL COMMENT '站点名称',
+                                   `url` varchar(255) NOT NULL COMMENT '站点地址',
+                                   `icon_url` varchar(255) NOT NULL COMMENT '站点地址',
+                                   `degree` smallint(4) default 1 COMMENT '喜爱程度',
+                                   `descp` varchar(255) NULL COMMENT '站点描述',
+                                   `count` int(10) default 0 COMMENT '点击次数',
+                                   `sn` int(10) default 0 COMMENT '顺序号',
+                                   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                   `modify_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+                                   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='收藏夹-站点';
 SET FOREIGN_KEY_CHECKS = 1;

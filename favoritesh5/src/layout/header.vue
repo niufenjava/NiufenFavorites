@@ -25,7 +25,7 @@
           </el-menu-item>
           <el-menu-item index="/dict">Dict</el-menu-item>
           <el-menu-item index="/notebook">Notebook</el-menu-item>
-          <el-menu-item index="/webSite">WebSite</el-menu-item>
+          <el-menu-item index="/favorite">Favorite</el-menu-item>
           <el-menu-item index="/todo">Todo</el-menu-item>
           <el-menu-item index="/message">Message</el-menu-item>
         </el-menu>

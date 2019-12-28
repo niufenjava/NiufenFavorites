@@ -360,6 +360,7 @@ export default {
     open (id, word, noteId) {
       console.info(word)
       this.word = {}
+      this.word.name = word
       if (id === null) {
         this.word.name = word
       }
@@ -373,8 +374,13 @@ export default {
       if (!this.word || this.word === null || this.word === '') {
         return
       }
+      var _ = this
       dictApi.wordCreateOrUpdate(this.word).then(response => {
         console.info(response)
+        console.info('_.word.id', _.word.id)
+        if (_.word.id === null || _.word.id === undefined) {
+          _.wordInfo()
+        }
         if (close) {
              this.drawer = false
              this.$emit('parentCallback', this.word.id, this.word.name)

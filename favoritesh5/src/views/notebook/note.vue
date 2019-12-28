@@ -302,7 +302,7 @@ export default {
     },
     // 阅读模式选择单词回调
     mdViewSelectWordCallback(txt) {
-      this.searchInput = txt
+      this.searchInput = txt.toLocaleLowerCase()
       this.search()
     },
     // 获取笔记详情
@@ -319,7 +319,7 @@ export default {
     // 关联单词按钮
     addWordRelClick () {
       console.info('this.searchInput', this.searchInput)
-      this.$refs.editWordComp.open(null, this.searchInput)
+      this.$refs.editWordComp.open(null, this.searchInput, this.noteId)
     },
     // 关联单词搜索
     search () {

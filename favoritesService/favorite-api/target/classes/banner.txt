@@ -1,5 +1,6 @@
 ====================================================================================================================
 
                     欢迎使用 renren-api - Powered By https://www.renren.io
-
+cp -r /Users/niufen/.m2/repository/io/renren/favorite-api/4.0.0/favorite-api-4.0.0.jar /Users/niufen/server
+java -jar ~/server/favorite-api-4.0.0.jar --spring.profiles.active=test  >> favorite-api.log  &
 ====================================================================================================================

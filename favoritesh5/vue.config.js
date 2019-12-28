@@ -17,7 +17,7 @@ module.exports = {
         proxy: {
             // 配置跨域
             '/favorite-api/*': {
-                target: 'http://localhost:7788/favorite-api/',
+                target: 'http://localhost:7789/favorite-api/',
                 ws: true,
                 secure: false,
                 changOrigin: true,

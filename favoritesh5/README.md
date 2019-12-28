@@ -1,4 +1,6 @@
 # favoritesh5
+rm -rf /Users/niufen/server/favorite/*
+cp -r /Users/niufen/code/Git-Niufen/NiufenFavorites/favoritesh5/dist/* /Users/niufen/server/favorite 
 
 ## Project setup
 ```

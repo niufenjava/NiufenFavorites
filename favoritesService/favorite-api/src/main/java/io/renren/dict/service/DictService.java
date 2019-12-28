@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.ListUtils;
 import io.renren.common.utils.ObjectTools;
+import io.renren.common.utils.StrUtils;
 import io.renren.dict.bo.WordSimpleBO;
 import io.renren.dict.entity.DictWordDefEntity;
 import io.renren.dict.entity.DictWordDefExampleEntity;
@@ -70,24 +71,37 @@ public class DictService {
         List<String> changeList = ListUtils.newStringList();
         if(ObjectTools.isNotNull(wordEntity.getName())){
             changeList.add(wordEntity.getName());
+            changeList.add(StrUtils.firstToUpperCase(wordEntity.getName()));
+
         }
         if(ObjectTools.isNotNull(wordEntity.getOther())){
             changeList.add(wordEntity.getOther());
+            changeList.add(StrUtils.firstToUpperCase(wordEntity.getOther()));
         }
         if(ObjectTools.isNotNull(wordEntity.getPastParticiple())){
             changeList.add(wordEntity.getPastParticiple());
+            changeList.add(StrUtils.firstToUpperCase(wordEntity.getPastParticiple()));
+
         }
         if(ObjectTools.isNotNull(wordEntity.getPastTense())){
             changeList.add(wordEntity.getPastTense());
+            changeList.add(StrUtils.firstToUpperCase(wordEntity.getPastTense()));
+
         }
         if(ObjectTools.isNotNull(wordEntity.getPlural())){
             changeList.add(wordEntity.getPlural());
+            changeList.add(StrUtils.firstToUpperCase(wordEntity.getPlural()));
+
         }
         if(ObjectTools.isNotNull(wordEntity.getPresentParticiple())){
             changeList.add(wordEntity.getPresentParticiple());
+            changeList.add(StrUtils.firstToUpperCase(wordEntity.getPresentParticiple()));
+
         }
         if(ObjectTools.isNotNull(wordEntity.getThirdSingular())){
             changeList.add(wordEntity.getThirdSingular());
+            changeList.add(StrUtils.firstToUpperCase(wordEntity.getThirdSingular()));
+
         }
         return changeList;
     }

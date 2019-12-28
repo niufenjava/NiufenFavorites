@@ -91,13 +91,15 @@
     highlight(text, words, tag) {
         // 默认的标签，如果没有指定，使用span
         tag = tag || 'span'
-        var i; var len = words.length; var re
+        var i; var len = words.length
+        console.info(words)
         for (i = 0; i < len; i++) {
             // 正则匹配所有的文本
-            re = new RegExp(words[i], 'g')
-            if (re.test(text)) {
-                text = text.replace(re, '<' + tag + ' class="highlight">$&</' + tag + '>')
-            }
+            // re = new RegExp(words[i], 'g')
+            // if (re.test(text)) {
+            //     text = text.replace(re, '<' + tag + ' class="highlight">$&</' + tag + '>')
+            // }
+            text = text.replace(words[i], '<' + tag + ' class="highlight">' + words[i] + '</' + tag + '>')
         }
         return text
       }
@@ -106,7 +108,7 @@
 </script>
 <style>
 .hljs p {
-  font-size: 20px;
+  font-size: 24px;
 }
 .hljs {
   box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 12px 0px;

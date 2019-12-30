@@ -358,6 +358,7 @@ export default {
     },
     // 打开抽屉方法
     open (id, word, noteId) {
+      this.$refs.thirdDictRef.open(this.wordName)
       console.info(word)
       this.word = {}
       this.word.name = word

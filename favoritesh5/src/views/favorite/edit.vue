@@ -104,7 +104,7 @@ export default {
           ],
           url: [
             { required: true, message: '请输入网址URL', trigger: 'blur' },
-            { min: 8, max: 50, message: '长度在 8 到 50 个字符', trigger: 'blur' }
+            { min: 8, max: 150, message: '长度在 8 到 150 个字符', trigger: 'blur' }
           ],
           typeId: [
             { required: true, message: '请选择一个类型', trigger: 'change' }

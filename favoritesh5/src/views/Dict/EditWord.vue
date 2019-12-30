@@ -323,6 +323,7 @@ export default {
         if (response.word.name) {
         this.word = response.word
         this.wordName = this.word.name
+        this.$refs.thirdDictRef.open(this.wordName)
         }
       }).catch(err => {
         console.log(err)
@@ -358,7 +359,6 @@ export default {
     },
     // 打开抽屉方法
     open (id, word, noteId) {
-      this.$refs.thirdDictRef.open(this.wordName)
       console.info(word)
       this.word = {}
       this.word.name = word
